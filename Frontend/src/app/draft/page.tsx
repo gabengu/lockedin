@@ -3,18 +3,49 @@ import React from "react"
 
 export default function Draft() {
 
-    const[draftType, setDraftType] = React.useState("normal")
+    type Draft = "normal" | "fearless" | "ironman"
+    const[draftType, setDraftType] = React.useState<Draft>("normal")
 
-    const draftDesc: Record<string, string> = {
-        normal: "Standard competitive draft.",
+    const[draftLink, setDraftLink] = React.useState<string | null>(null)
+
+    const draftDesc: Record<Draft, string> = {
+        normal: "Standard competitive snake draft.",
         fearless: "Standard draft rules, but each champion may only be picked once in a series.",
         ironman: "Fearless draft rules, but bans carry over across games."
     }
 
+    type DraftData = {
+        team1: string
+        team2: string
+        draftType: Draft
+    }
+
+    function generateLink(draftType: Draft) {
+        const id: string = Math.random().toString(36).slice(2,12)
+        //console.log("generating link for " + draftType)
+        let test = draftType + "-" + id
+        //console.log("test: " + test)
+        return test
+    }
+
+    function handleSubmit(event: React.FormEvent<HTMLFormElement>){
+        event.preventDefault()
+        const formData = new FormData(event.currentTarget);
+        const data: DraftData = {
+            team1: formData.get("team1") as string,
+            team2: formData.get("team2") as string,
+            draftType: formData.get("draftType") as Draft
+        }
+        //console.log("creating draft with:", data)
+        const link = generateLink(data.draftType)
+        setDraftLink(link)
+        //console.log("generated link: " + draftLink)
+    }
+    
     return (
         <section className="max-w-xl mx-auto p-6 bg-gray-900 text-white rounded-xl shadow-lg">
             <h1 className="text-2xl font-bold mb-6 text-center">Welcome to the WSM Drafting Tool!</h1>
-            <form className="flex flex-col gap-6">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 <div className="flex flex-col sm:flex-row gap-6">
                     <label className="flex flex-col flex-1">
                         <span className="mb-1 font-medium">Team 1 Name:</span>
@@ -82,6 +113,18 @@ export default function Draft() {
                     Create Draft Link
                 </button>
             </form>
+            {draftLink &&(
+                <div className="mt-4 space-x-2">
+                    <button
+                        onClick={() => navigator.clipboard.writeText(window.location.origin + "/draft/" + draftLink)}
+                        className="px-4 py-2 bg-gray-700 text-white rounded">Copy Draft Link
+                    </button>
+                    <button
+                        onClick={() => (document.location.href = "/draft/" + draftLink)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded">Go to Draft
+                    </button>
+                </div>
+            )}
         </section>
     );
 }
