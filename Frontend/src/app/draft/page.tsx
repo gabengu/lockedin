@@ -1,12 +1,14 @@
 "use client"
-import React from "react"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 export default function Draft() {
 
+    const router = useRouter()
     type Draft = "normal" | "fearless" | "ironman"
-    const[draftType, setDraftType] = React.useState<Draft>("normal")
+    const[draftType, setDraftType] = useState<Draft>("normal")
 
-    const[draftLink, setDraftLink] = React.useState<string | null>(null)
+    const[draftLink, setDraftLink] = useState<string | null>(null)
 
     const draftDesc: Record<Draft, string> = {
         normal: "Standard competitive snake draft.",
@@ -120,7 +122,7 @@ export default function Draft() {
                         className="px-4 py-2 bg-gray-700 text-white rounded">Copy Draft Link
                     </button>
                     <button
-                        onClick={() => (document.location.href = "/draft/" + draftLink)}
+                        onClick={() => router.push("/draft/" + draftLink)}
                         className="px-4 py-2 bg-blue-600 text-white rounded">Go to Draft
                     </button>
                 </div>
