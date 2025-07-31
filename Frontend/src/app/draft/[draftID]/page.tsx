@@ -20,5 +20,5 @@ export default function DraftRoom() {
   const iconElements = Object.keys(champions).map((name: string) => {
     return <Icons name={name} />;
   });
-  return <main>{iconElements}</main>;
+  return <main className="flex flex-wrap">{iconElements}</main>;
 }
