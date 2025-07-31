@@ -7,6 +7,7 @@ type IconsProps = {
 export default function Icons(props: IconsProps) {
   return (
     <Image
+      className="hover:scale-[105%] transition-all cursor-pointer"
       alt={props.name}
       height={100}
       width={100}
