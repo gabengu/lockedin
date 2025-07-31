@@ -1,22 +1,24 @@
-import champion from "./champion.json" assert { type: "json" };
+"use client";
+import { useState, useEffect } from "react";
 import Icons from "./icons.tsx";
 
-const champsString = JSON.stringify(champion);
-const champsObj = JSON.parse(champsString);
-const names = Object.keys(champsObj.data);
-const iconElements = names.map((name) => {
-  return <Icons name={name} />;
-});
-export default async function DraftRoom({
-  params,
-}: {
-  params: { draftID: string };
-}) {
-  const draftId = (await params).draftID;
-
-  //https://ddragon.leagueoflegends.com/cdn/15.15.1/data/en_US/champion.json
-
-  // https://ddragon.leagueoflegends.com/cdn/15.15.1/img/champion/Aatrox.png
-
+export default function DraftRoom() {
+  const [champions, setChampions] = useState({});
+  useEffect(() => {
+    async function getChampions() {
+      const response = await fetch(
+        "https://ddragon.leagueoflegends.com/cdn/13.20.1/data/en_US/champion.json"
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch champions");
+      }
+      const data = await response.json();
+      setChampions(data.data);
+    }
+    getChampions();
+  }, []);
+  const iconElements = Object.keys(champions).map((name: string) => {
+    return <Icons name={name} />;
+  });
   return <main>{iconElements}</main>;
 }
