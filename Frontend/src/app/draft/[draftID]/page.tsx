@@ -17,8 +17,10 @@ export default function DraftRoom() {
     }
     getChampions();
   }, []);
-  const iconElements = Object.keys(champions).map((name: string) => {
-    return <Icons name={name} />;
-  });
-  return <main className="flex flex-wrap">{iconElements}</main>;
+  const iconElements = Object.keys(champions).map(
+    (name: string, index: number) => {
+      return <Icons key={index} name={name} />;
+    }
+  );
+  return <main className="flex flex-wrap ">{iconElements}</main>;
 }
