@@ -22,6 +22,8 @@ export default function Draft() {
     draftType: Draft;
   };
 
+  let data: DraftData;
+
   function generateLink(draftType: Draft) {
     const id: string = Math.random().toString(36).slice(2, 12);
     //console.log("generating link for " + draftType)
@@ -33,7 +35,7 @@ export default function Draft() {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const data: DraftData = {
+    data = {
       team1: formData.get("team1") as string,
       team2: formData.get("team2") as string,
       draftType: formData.get("draftType") as Draft,

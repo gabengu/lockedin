@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Icons from "./icons.tsx";
 
+
 export default function DraftRoom() {
   const [champions, setChampions] = useState({});
   useEffect(() => {
@@ -22,5 +23,10 @@ export default function DraftRoom() {
       return <Icons key={index} name={name} />;
     }
   );
-  return <main className="flex flex-wrap ">{iconElements}</main>;
+
+  return (
+    <main className="flex flex-wrap ">
+      {iconElements}
+    </main>
+  )
 }
