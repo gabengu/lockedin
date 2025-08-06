@@ -1,9 +1,8 @@
 -- CreateTable
 CREATE TABLE "public"."user" (
-    "id" SERIAL NOT NULL,
-    "email" TEXT NOT NULL,
-    "username" TEXT NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
     "emailVerified" BOOLEAN NOT NULL,
     "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL,
@@ -21,7 +20,7 @@ CREATE TABLE "public"."session" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "ipAddress" TEXT,
     "userAgent" TEXT,
-    "userId" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
 
     CONSTRAINT "session_pkey" PRIMARY KEY ("id")
 );
@@ -31,7 +30,7 @@ CREATE TABLE "public"."account" (
     "id" TEXT NOT NULL,
     "accountId" TEXT NOT NULL,
     "providerId" TEXT NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
     "accessToken" TEXT,
     "refreshToken" TEXT,
     "idToken" TEXT,
@@ -59,9 +58,6 @@ CREATE TABLE "public"."verification" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "public"."user"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "user_username_key" ON "public"."user"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "session_token_key" ON "public"."session"("token");
