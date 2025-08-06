@@ -64,6 +64,7 @@ export default function DraftRoom({params,}: {params: Promise<{ draftID: string 
       </main>}
     </>
   )
+
 }
 
 
