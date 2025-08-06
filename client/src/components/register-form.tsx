@@ -12,11 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export function RegisterForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+    const router = useRouter();
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -44,8 +46,14 @@ export function RegisterForm({
                 password: password,
             },
             {
-                onRequest: () => {},
-                onSuccess: () => {},
+                onRequest: () => {
+                    toast.loading("Creating your account...");
+                },
+                onSuccess: () => {
+                    toast.dismiss();
+                    toast.success("Account created successfully!");
+                    router.push("/");
+                },
                 onError: (ctx) => {
                     toast.error(ctx.error.message);
                 },
