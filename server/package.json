@@ -11,6 +11,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "socket.io": "^4.8.1"
+    "@types/socket.io": "^3.0.1",
+    "socket.io": "^4.8.1",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.2.0"
   }
 }
