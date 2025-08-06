@@ -6,8 +6,7 @@ export default function Home() {
       <NavBar/>
          <div className="flex flex-col items-center justify-center h-screen text-white">
             <div className="bg-white opacity-20 h-1/2 w-3/4 rounded-2xl border-1"></div>
-         </div>
-
+      </div>
     </div>
   );
 }
