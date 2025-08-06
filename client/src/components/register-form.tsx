@@ -22,7 +22,7 @@ export function RegisterForm({
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
-        console.log(formData);
+
         const email = formData.get("email") as string;
         if (!email) return toast.error("Email is required");
 
@@ -53,7 +53,7 @@ export function RegisterForm({
                 onSuccess: () => {
                     toast.dismiss();
                     toast.success("Account created successfully!");
-                    console.log(data);
+                    router.push("/");
                 },
                 onError: (ctx) => {
                     toast.dismiss();
