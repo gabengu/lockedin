@@ -1,26 +1,69 @@
-"use client";
-import { useState, useEffect } from "react";
+"use client"
+import { use, useEffect, useState } from "react";
 import Icons from "./icons.tsx";
+import { notFound,  useRouter } from "next/navigation"
+import { getDraft } from "../roomStore.ts"
 
-export default function DraftRoom() {
-  const [champions, setChampions] = useState({});
-  useEffect(() => {
-    async function getChampions() {
-      const response = await fetch(
-        "https://ddragon.leagueoflegends.com/cdn/13.20.1/data/en_US/champion.json"
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch champions");
-      }
-      const data = await response.json();
-      setChampions(data.data);
+
+type DraftData = {
+  team1: string;
+  team2: string;
+  draftType: string;
+};
+
+type PageProps = {
+  params: { draftID: string };
+};
+
+export default function DraftRoom({params,}: {params: Promise<{ draftID: string }>}
+){
+  const router = useRouter()
+  const [draftData, setDraftData] = useState<DraftData>()
+  useEffect(() =>{
+    async function getData(){
+        const draftID = (await params).draftID
+        const draft = getDraft(draftID)
+        const draftInfo = (await draft)
+        if (draftInfo === undefined){
+          router.push("/notfound")
+        }
+        setDraftData(draftInfo)
     }
-    getChampions();
-  }, []);
-  const iconElements = Object.keys(champions).map(
-    (name: string, index: number) => {
-      return <Icons key={index} name={name} />;
-    }
-  );
-  return <main className="flex flex-wrap ">{iconElements}</main>;
+    getData()
+  }, [])
+
+
+  // const [champions, setChampions] = useState({});
+
+  // useEffect(() => {
+  //   async function getChampions() {
+  //     const response = await fetch(
+  //       "https://ddragon.leagueoflegends.com/cdn/13.20.1/data/en_US/champion.json"
+  //     );
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch champions");
+  //     }
+  //     const data = await response.json();
+  //     setChampions(data.data);
+  //   }
+  //   getChampions();
+  // }, []);
+  // const iconElements = Object.keys(champions).map(
+  //   (name: string, index: number) => {
+  //     return <Icons key={index} name={name} />;
+  //   }
+  // );
+
+  return (
+    <>
+      {draftData &&
+      <main>
+        <h1>Draft Mode: {draftData?.draftType}</h1>
+        <div>{draftData?.team1}</div>
+        <div>{draftData?.team2}</div>
+      </main>}
+    </>
+  )
 }
+
+

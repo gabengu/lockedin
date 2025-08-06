@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { handleSaveDraft } from "./roomStore";
 
 export default function Draft() {
   const router = useRouter();
@@ -22,25 +23,20 @@ export default function Draft() {
     draftType: Draft;
   };
 
-  function generateLink(draftType: Draft) {
-    const id: string = Math.random().toString(36).slice(2, 12);
-    //console.log("generating link for " + draftType)
-    let test = draftType + "-" + id;
-    //console.log("test: " + test)
-    return test;
-  }
+  let data: DraftData;
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const data: DraftData = {
+    data = {
       team1: formData.get("team1") as string,
       team2: formData.get("team2") as string,
       draftType: formData.get("draftType") as Draft,
     };
     //console.log("creating draft with:", data)
-    const link = generateLink(data.draftType);
-    setDraftLink(link);
+    const id = await handleSaveDraft(data)
+    setDraftLink(id)
+    console.log("id: " + id)
     //console.log("generated link: " + draftLink)
   }
 
