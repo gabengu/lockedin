@@ -55,6 +55,7 @@ export function RegisterForm({
                     router.push("/");
                 },
                 onError: (ctx) => {
+                    toast.dismiss();
                     toast.error(ctx.error.message);
                 },
             },
