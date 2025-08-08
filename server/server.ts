@@ -10,12 +10,12 @@ io.on("connection", (socket: Socket) => {
     console.log(socket.id);
 
     socket.on("send_red", (data) => {
-        socket.broadcast.emit("recieve_message", data)
-    })
+        socket.broadcast.emit("recieve_message", data);
+    });
     socket.on("send_blue", (data) => {
-        socket.broadcast.emit("recieve_message", data)
-    })
+        socket.broadcast.emit("recieve_message", data);
+    });
     socket.on("send_spec", (data) => {
-        socket.broadcast.emit("recieve_message", data)
-    })
+        socket.broadcast.emit("recieve_message", data);
+    });
 });
