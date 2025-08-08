@@ -1,8 +1,7 @@
 "use client";
 
 import io from "socket.io-client";
-import { use, useEffect, useState } from "react";
-import { set } from "better-auth";
+import { useEffect, useState, useRef } from "react";
 import { Socket } from "socket.io-client";
 
 type teamInfo = {
@@ -13,28 +12,46 @@ type teamInfo = {
     spectators: number;
 };
 
-export default function Select() {
+type room = {
+    roomId: string;
+};
+
+export default function Select({ roomId }: room) {
     //const [redDrafter, setRedDrafter] = useState("");
-    const [socket, setSocket] = useState<Socket>();
+    const socketRef = useRef<Socket>(null);
     useEffect(() => {
-        setSocket(io("http://localhost:3001"));
-    }, []);
+        socketRef.current = io("http://localhost:3001");
+        socketRef.current.emit("join-room", {
+            message: "ROOM JOINED",
+            room: roomId,
+        });
+        socketRef.current.on("recieve_message", (data) => {
+            alert(data.message);
+        });
+        return () => {
+            socketRef.current?.off("recieve_message");
+            socketRef.current?.disconnect();
+        };
+    }, [roomId]);
 
     const redClicked = () => {
-        socket?.emit("send_red", { message: "RED PICKED" });
-        console.log("hello");
+        socketRef.current?.emit("send_red", {
+            message: "RED PICKED",
+            room: roomId,
+        });
     };
     const blueClicked = () => {
-        socket?.emit("send_blue", { message: "BLUE PICKED" });
-        console.log("hi");
+        socketRef.current?.emit("send_blue", {
+            message: "BLUE PICKED",
+            room: roomId,
+        });
     };
     const specClicked = () => {
-        socket?.emit("send_spec", { message: "SPEC CLICKED" });
+        socketRef.current?.emit("send_spec", {
+            message: "SPEC CLICKED",
+            room: roomId,
+        });
     };
-
-    socket?.on("recieve_message", (data) => {
-        alert(data.message);
-    });
 
     return (
         <>
