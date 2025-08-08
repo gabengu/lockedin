@@ -4,6 +4,7 @@ import Icons from "./icons.tsx";
 import { notFound, useRouter } from "next/navigation";
 import { getDraft } from "../roomStore.ts";
 import Select from "@/components/select.tsx";
+import { set } from "better-auth";
 
 type DraftData = {
     team1: string;
@@ -12,19 +13,17 @@ type DraftData = {
 };
 
 type PageProps = {
-    params: { draftID: string };
+    draftID: string;
 };
 
-export default function DraftRoom({
-    params,
-}: {
-    params: Promise<{ draftID: string }>;
-}) {
+export default function DraftRoom({ params }: { params: Promise<PageProps> }) {
     const router = useRouter();
     const [draftData, setDraftData] = useState<DraftData>();
+    const [roomId, setRoomId] = useState<string>("");
     useEffect(() => {
         async function getData() {
             const draftID = (await params).draftID;
+            setRoomId(draftID);
             const draft = getDraft(draftID);
             const draftInfo = await draft;
             if (draftInfo === undefined) {
@@ -63,7 +62,7 @@ export default function DraftRoom({
                     <h1>Draft Mode: {draftData?.draftType}</h1>
                     <div>{draftData?.team1}</div>
                     <div>{draftData?.team2}</div>
-                    <Select />
+                    <Select roomId={roomId} />
                 </main>
             )}
         </>
