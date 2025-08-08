@@ -3,6 +3,7 @@ import { use, useEffect, useState } from "react";
 import Icons from "./icons.tsx";
 import { notFound,  useRouter } from "next/navigation"
 import { getDraft } from "../roomStore.ts"
+import Select from "./select.tsx";
 
 
 type DraftData = {
@@ -61,6 +62,7 @@ export default function DraftRoom({params,}: {params: Promise<{ draftID: string 
         <h1>Draft Mode: {draftData?.draftType}</h1>
         <div>{draftData?.team1}</div>
         <div>{draftData?.team2}</div>
+        <div><Select /></div>
       </main>}
     </>
   )
