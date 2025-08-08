@@ -12,11 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export function RegisterForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+    const router = useRouter();
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -24,8 +26,8 @@ export function RegisterForm({
         const email = formData.get("email") as string;
         if (!email) return toast.error("Email is required");
 
-        const name = formData.get("username") as string;
-        if (!name) return toast.error("Username is required");
+        const username = formData.get("username") as string;
+        if (!username) return toast.error("Username is required");
 
         const password = formData.get("password") as string;
         if (!password) return toast.error("Password is required");
@@ -39,14 +41,22 @@ export function RegisterForm({
 
         const { data, error } = await authClient.signUp.email(
             {
-                name: name,
+                name: "",
                 email: email,
                 password: password,
+                username: username,
             },
             {
-                onRequest: () => {},
-                onSuccess: () => {},
+                onRequest: () => {
+                    toast.loading("Creating your account...");
+                },
+                onSuccess: () => {
+                    toast.dismiss();
+                    toast.success("Account created successfully!");
+                    router.push("/");
+                },
                 onError: (ctx) => {
+                    toast.dismiss();
                     toast.error(ctx.error.message);
                 },
             },
