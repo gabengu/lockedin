@@ -3,7 +3,7 @@ import { use, useEffect, useState } from "react";
 import Icons from "./icons.tsx";
 import { notFound, useRouter } from "next/navigation";
 import { getDraft } from "../roomStore.ts";
-import Select from "./select.tsx";
+import Select from "@/components/select.tsx";
 
 type DraftData = {
     team1: string;
