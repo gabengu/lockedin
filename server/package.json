@@ -1,21 +1,22 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "main": "server.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.ts"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "@types/socket.io": "^3.0.1",
-    "socket.io": "^4.8.1",
-    "typescript": "^5.9.2"
-  },
-  "devDependencies": {
-    "@types/node": "^24.2.0"
-  }
+    "name": "server",
+    "version": "1.0.0",
+    "main": "server.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "ts-node server.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "@types/socket.io": "^3.0.1",
+        "socket.io": "^4.8.1",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.2"
+    },
+    "devDependencies": {
+        "@types/node": "^24.2.0"
+    }
 }
