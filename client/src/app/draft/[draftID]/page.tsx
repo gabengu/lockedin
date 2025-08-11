@@ -1,26 +1,29 @@
-"use client"
+"use client";
 import { use, useEffect, useState } from "react";
 import Icons from "./icons.tsx";
 import SplashArt from "./splashArt.tsx";
 import { draftOrder } from "./draftOrder.tsx"; 
 import { notFound,  useRouter } from "next/navigation"
-import { getDraft } from "../roomStore.ts"
-
+import { getDraft } from "../roomStore.ts";
+import Select from "@/components/select.tsx";
+import { set } from "better-auth";
 
 type DraftData = {
-  team1: string;
-  team2: string;
-  draftType: string;
+    team1: string;
+    team2: string;
+    draftType: string;
 };
 
 type PageProps = {
-  params: { draftID: string };
+    draftID: string;
 };
 
 export default function DraftRoom({params,}: {params: Promise<{ draftID: string }>}
 ){
   const router = useRouter()
   const [draftData, setDraftData] = useState<DraftData>()
+  
+  const [roomId, setRoomId] = useState<string>("");
 
   const [allChampions, setAllChampions] = useState<string[]>([]);
   const [filterChampions, setFilterChampions] = useState<string[]>([]);
@@ -60,25 +63,6 @@ export default function DraftRoom({params,}: {params: Promise<{ draftID: string 
     getAllChampions();
     getData()
   }, [])
-
-  // useEffect(() => {
-  //   async function getChampions() {
-  //     const response = await fetch(
-  //       "https://ddragon.leagueoflegends.com/cdn/13.20.1/data/en_US/champion.json"
-  //     );
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch champions");
-  //     }
-  //     const data = await response.json();
-  //     setChampions(data.data);
-  //   }
-  //   getChampions();
-  // }, []);
-  // const iconElements = Object.keys(champions).map(
-  //   (name: string, index: number) => {
-  //     return <Icons key={index} name={name} />;
-  //   }
-  // );
 
     const renderIcons = () => {
     return filterChampions.map(
@@ -153,7 +137,4 @@ export default function DraftRoom({params,}: {params: Promise<{ draftID: string 
     </div>}
     </>
   )
-
 }
-
-
