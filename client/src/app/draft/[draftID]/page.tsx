@@ -99,7 +99,7 @@ export default function DraftRoom({params,}: {params: Promise<{ draftID: string 
         {draftData.team2}
       </h1>
       </div>
-      <div className="flex flex-row justify-between mt-20">
+      <div className="flex flex-row justify-between">
         <div className=" flex flex-col w-[300px]">
           <div className=" border-t-2 border-r-2 border-gray-600 flex-1 ">
             <SplashArt name={"Lucian"} />
@@ -116,8 +116,27 @@ export default function DraftRoom({params,}: {params: Promise<{ draftID: string 
             <div className="border-t-2 border-r-2 border-b-2 border-gray-600 w-[60px] h-[60px]"></div>
           </div>
         </div>
+        
 
-        <div className=" flex flex-wrap overflow-y-auto w-[800px] h-[calc(100vh-180px)] items-center justify-center hide-scrollbar">{renderIcons()}</div>
+
+        <div className="flex flex-col items-center">
+          <div className=" flex flex-row justify-between w-[731px]">
+            <div className=" flex flex-row w-[250px] justify-between items-center">
+              <div className="bg-amber-300 w-[40px] h-[40px]"></div>
+              <div className="bg-amber-300 w-[40px] h-[40px]"></div>
+              <div className="bg-amber-300 w-[40px] h-[40px]"></div>
+              <div className="bg-amber-300 w-[40px] h-[40px]"></div>
+              <div className="bg-amber-300 w-[40px] h-[40px]"></div>
+            </div>
+              <div className="inline-block border-2 border-amber-400">
+                <input className="" type="text" id="myTextInput" name="myTextInput" />
+              </div>
+         
+
+          </div>
+
+          <div className=" flex flex-wrap overflow-y-auto w-[800px] h-[calc(100vh-180px)] items-center justify-center hide-scrollbar">{renderIcons()}</div>
+        </div>
 
         <div className=" flex flex-col w-[300px]">
           <div className=" border-t-2 border-l-2 border-gray-600 flex-1 "></div>
