@@ -37,8 +37,8 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
   const [blueTeamBans, setBlueTeamBans] = useState(new Array(5).fill(null));
   const [redTeamBans, setRedTeamBans] = useState(new Array(5).fill(null));
 
-  const [draftStep, setDraftStep] = useState<number>(0);
-  const [draftCompletion, setDraftCompletion] = useState<boolean>(false);
+  const [draftStep, setDraftStep] = useState<number>(20);
+  const [draftCompletion, setDraftCompletion] = useState<boolean>(true);
 
   useEffect(() => {
     async function getData() {
@@ -77,6 +77,7 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
       }
     );
   }
+
   function addChampion (array: string[], champion: string): string[] {
     const next = [...array]
     const index = next.findIndex(e => e === null)
@@ -84,10 +85,17 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
     return next
   }
 
+  function setNull(array: (string | null)[]): (string | null)[]{
+    for (let i = 0; i < array.length; i++){
+      array[i] = null
+    }
+    return array
+  }
+
   const handleChampionClick = (champion: string, team: "blue" | "red") => {
     // For websocket implementation use
     // if (team == draftOrder[draftState.currentStep].side)
-    if (draftStep < 20){
+    if (draftCompletion == false){
       const invalidPick: boolean =
         globalBans.includes(champion) ||
         blueTeamBans.includes(champion) ||
@@ -100,15 +108,12 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
       }
       else{
         setSelectedPick(champion)
-        console.log(selectedPick)
       }
     }
   }
 
   const handleLockIn = () => {
     const step = draftOrder[draftStep];
-    console.log(selectedPick)
-
 
     if(selectedPick)
       if (step.action == "ban") {
@@ -128,32 +133,31 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
         }
       }
     setDraftStep(prev => prev + 1);
-    console.log(blueTeamBans)
-    console.log(blueTeamPicks)
-    console.log(redTeamBans)
-    console.log(redTeamPicks)
     setActiveSide(step.side);
     setSelectedPick(null)
+    console.log(draftStep)
 
-    if (draftStep == 20){
-      draftCompletion == true;
+    if (draftStep == 19){
+      setDraftCompletion(true)
     }
   }
 
-  // const restartDraft = () => {
-  //   if (draftData?.draftType == "fearless" || "ironman"){
-  //     setGlobalBans(prev => [...prev, ...blueTeamPicks, ...redTeamPicks])
-  //     if (draftData?.draftType == "ironman"){
-  //       setGlobalBans(prev => [...prev, ...blueTeamBans, ...redTeamBans])
-  //     }
-  //   }
-  //   setBlueTeamBans([])
-  //   setBlueTeamPicks([])
-  //   setRedTeamBans([])
-  //   setRedTeamPicks([])
-  //   setDraftStep(0)
-  //   setDraftCompletion(false)
-  // }
+  //Currently doubles as draft initiation.
+  const restartDraft = () => {
+    if (draftData?.draftType == "fearless" || "ironman"){
+      setGlobalBans(prev => [...prev, ...blueTeamPicks, ...redTeamPicks])
+      if (draftData?.draftType == "ironman"){
+        setGlobalBans(prev => [...prev, ...blueTeamBans, ...redTeamBans])
+      }
+    }
+    setDraftCompletion(false)
+    setBlueTeamBans(prev => setNull([...prev]))
+    setBlueTeamPicks(prev => setNull([...prev]))
+    setRedTeamBans(prev => setNull([...prev]))
+    setRedTeamPicks(prev => setNull([...prev]))
+    setDraftStep(0)
+    
+  }
 
   return (
     <>
@@ -236,8 +240,6 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
               </div>
             </div>
         
-
-
         <div className="flex flex-col items-center">
           <div className=" flex flex-row justify-between w-[731px]">
             <div className=" flex flex-row w-[250px] justify-between items-center">
@@ -250,8 +252,6 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
               <div className="inline-block border-2 border-amber-400">
                 <input className="" type="text" id="myTextInput" name="myTextInput" />
               </div>
-         
-
           </div>
 
           <div className=" flex flex-wrap overflow-y-auto w-[800px] h-[calc(100vh-180px)] items-center justify-center hide-scrollbar">{renderIcons()}</div>
@@ -328,11 +328,11 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
               Lock In
             </button>}
           </div>
-          {/* <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
             {draftCompletion && <button className="bg-green-600 text-white px-6 py-3 rounded-xl shadow-md hover:bg-green-700" onClick={() => restartDraft()}>
               Ready for Game
             </button>}
-          </div> */}
+          </div>
         </div>}
     </>
   )
