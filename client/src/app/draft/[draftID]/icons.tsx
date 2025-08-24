@@ -9,15 +9,15 @@ type IconsProps = {
 
 export default function Icons(props: IconsProps) {
   return (
-        <Image
-          alt={props.name}
-          height={props.height}
-          width={props.width}
-          src={
-            "https://ddragon.leagueoflegends.com/cdn/15.15.1/img/champion/" +
-            props.name +
-            ".png"
-          }
-        />
+      <Image
+        alt={props.name}
+        height={props.height}
+        width={props.width}
+        src={
+          "https://ddragon.leagueoflegends.com/cdn/15.15.1/img/champion/" +
+          props.name +
+          ".png"
+        }
+      />
   );
 }

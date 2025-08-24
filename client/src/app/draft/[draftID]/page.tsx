@@ -243,13 +243,13 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
         <div className="flex flex-col items-center">
           <div className=" flex flex-row justify-between w-[731px]">
             <div className=" flex flex-row w-[250px] justify-between items-center">
-              <div className="bg-amber-300 w-[40px] h-[40px]"></div>
-              <div className="bg-amber-300 w-[40px] h-[40px]"></div>
-              <div className="bg-amber-300 w-[40px] h-[40px]"></div>
-              <div className="bg-amber-300 w-[40px] h-[40px]"></div>
-              <div className="bg-amber-300 w-[40px] h-[40px]"></div>
+              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
+              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
+              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
+              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
+              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
             </div>
-              <div className="inline-block border-2 border-amber-400">
+              <div className="inline-block border-2 border-[#40865d]">
                 <input className="" type="text" id="myTextInput" name="myTextInput" />
               </div>
           </div>
@@ -324,12 +324,12 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
             </div>
           </div>
           <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-            {selectedPick && <button className="bg-green-600 text-white px-6 py-3 rounded-xl shadow-md hover:bg-green-700" onClick={() => handleLockIn()}>
+            {selectedPick && <button className="bg-[#4dab74] text-black text-[25px] w-[256px] h-[58px] rounded-xl shadow-md hover:bg-[#237244]" onClick={() => handleLockIn()}>
               Lock In
             </button>}
           </div>
           <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-            {draftCompletion && <button className="bg-green-600 text-white px-6 py-3 rounded-xl shadow-md hover:bg-green-700" onClick={() => restartDraft()}>
+            {draftCompletion && <button className="bg-[#4dab74] text-black text-[25px] w-[256px] h-[58px] rounded-xl shadow-md hover:bg-[#237244]" onClick={() => restartDraft()}>
               Ready for Game
             </button>}
           </div>
