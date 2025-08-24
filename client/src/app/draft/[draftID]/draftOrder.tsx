@@ -30,3 +30,4 @@ export const draftOrder: DraftAction[] = [
   { action: "pick", side: "blue", playerIndex: 5, index: 18 },
   { action: "pick", side: "red",  playerIndex: 5, index: 19 },
 ];
+
