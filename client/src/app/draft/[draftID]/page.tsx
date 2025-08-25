@@ -2,7 +2,7 @@
 import { use, useEffect, useState } from "react";
 import Icons from "./icons.tsx";
 import SplashArt from "./splashArt.tsx";
-import { draftOrder } from "./draftOrder.tsx";
+import { draftOrder, DraftChamps} from "./draftOrder.tsx";
 import { notFound, useRouter } from "next/navigation"
 import { getDraft } from "../roomStore.ts";
 import Select from "@/components/select.tsx";
@@ -29,16 +29,16 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
   const [filterChampions, setFilterChampions] = useState<string[]>([]);
   const [activeSide, setActiveSide] = useState<"blue" | "red">("blue");
 
-  const [selectedPick, setSelectedPick] = useState<string | null>(null);
-
-  const [globalBans, setGlobalBans] = useState<(string | null)[]>([]);
-  const [blueTeamPicks, setBlueTeamPicks] = useState(new Array(5).fill(null));
-  const [redTeamPicks, setRedTeamPicks] = useState(new Array(5).fill(null));
-  const [blueTeamBans, setBlueTeamBans] = useState(new Array(5).fill(null));
-  const [redTeamBans, setRedTeamBans] = useState(new Array(5).fill(null));
-
-  const [draftStep, setDraftStep] = useState<number>(20);
-  const [draftCompletion, setDraftCompletion] = useState<boolean>(true);
+  const [draftState, setDraftState] = useState<DraftChamps>({
+    globalBans: [],
+    blueTeamBans: new Array(5).fill(null),
+    redTeamBans: new Array(5).fill(null),
+    blueTeamPicks: new Array(5).fill(null),
+    redTeamPicks: new Array(5).fill(null),
+    draftStep: 20,
+    draftCompletion: true,
+    selectedPick: null
+  })
 
   useEffect(() => {
     async function getData() {
@@ -78,10 +78,12 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
     );
   }
 
-  function addChampion (array: string[], champion: string): string[] {
+  function addChampion (array: (string|null)[], champion: string | null): (string|null)[] {
     const next = [...array]
     const index = next.findIndex(e => e === null)
-    if (index !== -1) next[index] = champion
+    if (index !== -1) {
+      next[index] = champion
+    }
     return next
   }
 
@@ -95,68 +97,96 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
   const handleChampionClick = (champion: string, team: "blue" | "red") => {
     // For websocket implementation use
     // if (team == draftOrder[draftState.currentStep].side)
-    if (draftCompletion == false){
+    if (draftState.draftCompletion == false){
       const invalidPick: boolean =
-        globalBans.includes(champion) ||
-        blueTeamBans.includes(champion) ||
-        redTeamBans.includes(champion) ||
-        blueTeamPicks.includes(champion) ||
-        redTeamPicks.includes(champion);
+        draftState.globalBans.includes(champion) ||
+        draftState.blueTeamBans.includes(champion) ||
+        draftState.redTeamBans.includes(champion) ||
+        draftState.blueTeamPicks.includes(champion) ||
+        draftState.redTeamPicks.includes(champion);
 
       if (invalidPick) {
         throw new Error("Champion is banned or already picked!");
       }
       else{
-        setSelectedPick(champion)
+        setDraftState(prev => ({
+          ...prev,
+          selectedPick: champion
+        }))
       }
     }
   }
 
   const handleLockIn = () => {
-    const step = draftOrder[draftStep];
+    const step = draftOrder[draftState.draftStep];
 
-    if(selectedPick)
+    if(draftState.selectedPick)
       if (step.action == "ban") {
         if (step.side == "blue") {
-          setBlueTeamBans(prev => addChampion(prev, selectedPick));
+          setDraftState(prev => ({
+            ...prev,
+            blueTeamBans: addChampion(prev.blueTeamBans, draftState.selectedPick)
+          }));
         }
         if (step.side == "red"){
-          setRedTeamBans(prev => addChampion(prev, selectedPick));
+          setDraftState(prev => ({
+            ...prev,
+            redTeamBans: addChampion(prev.redTeamBans, draftState.selectedPick)
+          }));
         }
       }
       else if (step.action == "pick"){
         if (step.side == "blue") {
-          setBlueTeamPicks(prev => addChampion(prev, selectedPick));
+          setDraftState(prev => ({
+            ...prev,
+            blueTeamPicks: addChampion(prev.blueTeamPicks, draftState.selectedPick)
+          }));
         }
         if (step.side == "red"){
-          setRedTeamPicks(prev => addChampion(prev, selectedPick));
+          setDraftState(prev => ({
+            ...prev,
+            redTeamPicks: addChampion(prev.redTeamPicks, draftState.selectedPick)
+          }));
         }
       }
-    setDraftStep(prev => prev + 1);
+    setDraftState(prev => ({
+      ...prev,
+      draftStep: prev.draftStep + 1,
+      selectedPick: null
+    }))
     setActiveSide(step.side);
-    setSelectedPick(null)
-    console.log(draftStep)
 
-    if (draftStep == 19){
-      setDraftCompletion(true)
+    if (draftState.draftStep == 19){
+      setDraftState(prev =>({
+        ...prev,
+        draftCompletion: true
+      }))
     }
   }
 
   //Currently doubles as draft initiation.
   const restartDraft = () => {
     if (draftData?.draftType == "fearless" || "ironman"){
-      setGlobalBans(prev => [...prev, ...blueTeamPicks, ...redTeamPicks])
+      setDraftState(prev => ({
+        ...prev,
+        globalBans: [...prev.globalBans, ...draftState.blueTeamPicks, ...draftState.redTeamPicks]
+      }))
       if (draftData?.draftType == "ironman"){
-        setGlobalBans(prev => [...prev, ...blueTeamBans, ...redTeamBans])
+        setDraftState(prev => ({
+        ...prev,
+        globalBans: [...prev.globalBans, ...draftState.blueTeamBans, ...draftState.redTeamBans]
+        }))
       }
     }
-    setDraftCompletion(false)
-    setBlueTeamBans(prev => setNull([...prev]))
-    setBlueTeamPicks(prev => setNull([...prev]))
-    setRedTeamBans(prev => setNull([...prev]))
-    setRedTeamPicks(prev => setNull([...prev]))
-    setDraftStep(0)
-    
+    setDraftState(prev =>({
+      ...prev,
+      blueTeamBans: setNull(prev.blueTeamBans),
+      redTeamBans: setNull(prev.redTeamBans),
+      blueTeamPicks: setNull(prev.blueTeamPicks),
+      redTeamPicks: setNull(prev.redTeamPicks),
+      draftStep: 0,
+      draftCompletion: false
+    }))
   }
 
   return (
@@ -177,64 +207,64 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
           <div className="flex flex-row justify-between">
             <div className=" flex flex-col w-[300px]">
               <div className=" border-t-2 border-r-2 border-gray-600 flex-1 ">
-                {draftStep == 6 && selectedPick
-                    ? <SplashArt name={selectedPick} />
-                    : blueTeamPicks[0] ? <SplashArt name={blueTeamPicks[0]} />
+                {draftState.draftStep == 6 && draftState.selectedPick
+                    ? <SplashArt name={draftState.selectedPick} />
+                    : draftState.blueTeamPicks[0] ? <SplashArt name={draftState.blueTeamPicks[0]} />
                     : null}
               </div>
               <div className=" border-t-2 border-r-2 border-gray-600 flex-1 ">
-                {draftStep == 9 && selectedPick
-                    ? <SplashArt name={selectedPick} />
-                    : blueTeamPicks[1] ? <SplashArt name={blueTeamPicks[1]} />
+                {draftState.draftStep == 9 && draftState.selectedPick
+                    ? <SplashArt name={draftState.selectedPick} />
+                    : draftState.blueTeamPicks[1] ? <SplashArt name={draftState.blueTeamPicks[1]} />
                     : null}
               </div>
               <div className=" border-t-2 border-r-2 border-gray-600 flex-1 ">
-                {draftStep == 10 && selectedPick
-                    ? <SplashArt name={selectedPick} />
-                    : blueTeamPicks[2] ? <SplashArt name={blueTeamPicks[2]} />
+                {draftState.draftStep == 10 && draftState.selectedPick
+                    ? <SplashArt name={draftState.selectedPick} />
+                    : draftState.blueTeamPicks[2] ? <SplashArt name={draftState.blueTeamPicks[2]} />
                     : null}
               </div>
               <div className=" border-t-2 border-r-2 border-gray-600 flex-1 ">
-                {draftStep == 17 && selectedPick
-                    ? <SplashArt name={selectedPick} />
-                    : blueTeamPicks[3] ? <SplashArt name={blueTeamPicks[3]} />
+                {draftState.draftStep == 17 && draftState.selectedPick
+                    ? <SplashArt name={draftState.selectedPick} />
+                    : draftState.blueTeamPicks[3] ? <SplashArt name={draftState.blueTeamPicks[3]} />
                     : null}
               </div>
               <div className=" border-t-2 border-r-2 border-gray-600 flex-1 ">
-                {draftStep == 18 && selectedPick
-                    ? <SplashArt name={selectedPick} />
-                    : blueTeamPicks[4] ? <SplashArt name={blueTeamPicks[4]} />
+                {draftState.draftStep == 18 && draftState.selectedPick
+                    ? <SplashArt name={draftState.selectedPick} />
+                    : draftState.blueTeamPicks[4] ? <SplashArt name={draftState.blueTeamPicks[4]} />
                     : null}
               </div>
               <div className="flex flex-row">
                 <div className="border-t-2 border-r-2 border-b-2 border-gray-600 w-[60px] h-[60px]">
-                  {draftStep == 0 && selectedPick
-                    ? <Icons name={selectedPick} height={55} width={55} disable = {false} />
-                    : blueTeamBans[0] ? <Icons name={blueTeamBans[0]} height={55} width={55} disable = {false} />
+                  {draftState.draftStep == 0 && draftState.selectedPick
+                    ? <Icons name={draftState.selectedPick} height={55} width={55} disable = {false} />
+                    : draftState.blueTeamBans[0] ? <Icons name={draftState.blueTeamBans[0]} height={55} width={55} disable = {false} />
                     : null}
                 </div>
                 <div className="border-t-2 border-r-2 border-b-2 border-gray-600 w-[60px] h-[60px]">
-                  {draftStep == 2 && selectedPick
-                    ? <Icons name={selectedPick} height={55} width={55} disable = {false} />
-                    : blueTeamBans[1] ? <Icons name={blueTeamBans[1]} height={55} width={55} disable = {false} />
+                  {draftState.draftStep == 2 && draftState.selectedPick
+                    ? <Icons name={draftState.selectedPick} height={55} width={55} disable = {false} />
+                    : draftState.blueTeamBans[1] ? <Icons name={draftState.blueTeamBans[1]} height={55} width={55} disable = {false} />
                     : null}
                 </div>
                 <div className="border-t-2 border-r-2 border-b-2 border-gray-600 w-[60px] h-[60px]">
-                  {draftStep == 4 && selectedPick
-                    ? <Icons name={selectedPick} height={55} width={55} disable = {false} />
-                    : blueTeamBans[2] ? <Icons name={blueTeamBans[2]} height={55} width={55} disable = {false} />
+                  {draftState.draftStep == 4 && draftState.selectedPick
+                    ? <Icons name={draftState.selectedPick} height={55} width={55} disable = {false} />
+                    : draftState.blueTeamBans[2] ? <Icons name={draftState.blueTeamBans[2]} height={55} width={55} disable = {false} />
                     : null}
                 </div>
                 <div className="border-t-2 border-r-2 border-b-2 border-gray-600 w-[60px] h-[60px]">
-                  {draftStep == 13 && selectedPick
-                    ? <Icons name={selectedPick} height={55} width={55} disable = {false} />
-                    : blueTeamBans[3] ? <Icons name={blueTeamBans[3]} height={55} width={55} disable = {false}/>
+                  {draftState.draftStep == 13 && draftState.selectedPick
+                    ? <Icons name={draftState.selectedPick} height={55} width={55} disable = {false} />
+                    : draftState.blueTeamBans[3] ? <Icons name={draftState.blueTeamBans[3]} height={55} width={55} disable = {false}/>
                     : null}
                 </div>
                 <div className="border-t-2 border-r-2 border-b-2 border-gray-600 w-[60px] h-[60px]">
-                  {draftStep == 15 && selectedPick
-                    ? <Icons name={selectedPick} height={55} width={55} disable = {false} />
-                    : blueTeamBans[4] ? <Icons name={blueTeamBans[4]} height={55} width={55} disable = {false} />
+                  {draftState.draftStep == 15 && draftState.selectedPick
+                    ? <Icons name={draftState.selectedPick} height={55} width={55} disable = {false} />
+                    : draftState.blueTeamBans[4] ? <Icons name={draftState.blueTeamBans[4]} height={55} width={55} disable = {false} />
                     : null}
                 </div>
               </div>
@@ -259,77 +289,77 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
 
             <div className=" flex flex-col w-[300px]">
               <div className=" border-t-2 border-l-2 border-gray-600 flex-1 ">
-                {draftStep == 7 && selectedPick
-                    ? <SplashArt name={selectedPick} />
-                    : redTeamPicks[0] ? <SplashArt name={redTeamPicks[0]} />
+                {draftState.draftStep == 7 && draftState.selectedPick
+                    ? <SplashArt name={draftState.selectedPick} />
+                    : draftState.redTeamPicks[0] ? <SplashArt name={draftState.redTeamPicks[0]} />
                     : null}
               </div>
               <div className=" border-t-2 border-l-2 border-gray-600 flex-1 ">
-                {draftStep == 8 && selectedPick
-                    ? <SplashArt name={selectedPick} />
-                    : redTeamPicks[1] ? <SplashArt name={redTeamPicks[1]} />
+                {draftState.draftStep == 8 && draftState.selectedPick
+                    ? <SplashArt name={draftState.selectedPick} />
+                    : draftState.redTeamPicks[1] ? <SplashArt name={draftState.redTeamPicks[1]} />
                     : null}
               </div>
               <div className=" border-t-2 border-l-2 border-gray-600 flex-1 ">
-                {draftStep == 11 && selectedPick
-                    ? <SplashArt name={selectedPick} />
-                    : redTeamPicks[2] ? <SplashArt name={redTeamPicks[2]} />
+                {draftState.draftStep == 11 && draftState.selectedPick
+                    ? <SplashArt name={draftState.selectedPick} />
+                    : draftState.redTeamPicks[2] ? <SplashArt name={draftState.redTeamPicks[2]} />
                     : null}
               </div>
               <div className=" border-t-2 border-l-2 border-gray-600 flex-1 ">
-                {draftStep == 16 && selectedPick
-                    ? <SplashArt name={selectedPick} />
-                    : redTeamPicks[3] ? <SplashArt name={redTeamPicks[3]} />
+                {draftState.draftStep == 16 && draftState.selectedPick
+                    ? <SplashArt name={draftState.selectedPick} />
+                    : draftState.redTeamPicks[3] ? <SplashArt name={draftState.redTeamPicks[3]} />
                     : null}
               </div>
               <div className=" border-t-2 border-l-2 border-gray-600 flex-1 ">
-                {draftStep == 19 && selectedPick
-                    ? <SplashArt name={selectedPick} />
-                    : redTeamPicks[4] ? <SplashArt name={redTeamPicks[4]} />
+                {draftState.draftStep == 19 && draftState.selectedPick
+                    ? <SplashArt name={draftState.selectedPick} />
+                    : draftState.redTeamPicks[4] ? <SplashArt name={draftState.redTeamPicks[4]} />
                     : null}
               </div>
 
               <div className="flex flex-row">
                 <div className="border-t-2 border-l-2 border-b-2 border-gray-600 w-[60px] h-[60px]">
-                  {draftStep == 14 && selectedPick
-                    ? <Icons name={selectedPick} height={55} width={55} disable = {false} />
-                    : redTeamBans[4] ? <Icons name={redTeamBans[4]} height={55} width={55} disable = {false}/>
+                  {draftState.draftStep == 14 && draftState.selectedPick
+                    ? <Icons name={draftState.selectedPick} height={55} width={55} disable = {false} />
+                    : draftState.redTeamBans[4] ? <Icons name={draftState.redTeamBans[4]} height={55} width={55} disable = {false}/>
                     : null}
                 </div>
                 <div className="border-t-2 border-l-2 border-b-2 border-gray-600 w-[60px] h-[60px]">
-                  {draftStep == 12 && selectedPick
-                    ? <Icons name={selectedPick} height={55} width={55} disable = {false} />
-                    : redTeamBans[3] ? <Icons name={redTeamBans[3]} height={55} width={55} disable = {false}/>
+                  {draftState.draftStep == 12 && draftState.selectedPick
+                    ? <Icons name={draftState.selectedPick} height={55} width={55} disable = {false} />
+                    : draftState.redTeamBans[3] ? <Icons name={draftState.redTeamBans[3]} height={55} width={55} disable = {false}/>
                     : null}
                 </div>
                 <div className="border-t-2 border-l-2 border-b-2 border-gray-600 w-[60px] h-[60px]">
-                  {draftStep == 5 && selectedPick
-                    ? <Icons name={selectedPick} height={55} width={55} disable = {false} />
-                    : redTeamBans[2] ? <Icons name={redTeamBans[2]} height={55} width={55} disable = {false}/>
+                  {draftState.draftStep == 5 && draftState.selectedPick
+                    ? <Icons name={draftState.selectedPick} height={55} width={55} disable = {false} />
+                    : draftState.redTeamBans[2] ? <Icons name={draftState.redTeamBans[2]} height={55} width={55} disable = {false}/>
                     : null}
                 </div>
                 <div className="border-t-2 border-l-2 border-b-2 border-gray-600 w-[60px] h-[60px]">
-                  {draftStep == 3 && selectedPick
-                    ? <Icons name={selectedPick} height={55} width={55} disable = {false} />
-                    : redTeamBans[1] ? <Icons name={redTeamBans[1]} height={55} width={55} disable = {false} />
+                  {draftState.draftStep == 3 && draftState.selectedPick
+                    ? <Icons name={draftState.selectedPick} height={55} width={55} disable = {false} />
+                    : draftState.redTeamBans[1] ? <Icons name={draftState.redTeamBans[1]} height={55} width={55} disable = {false} />
                     : null}
                 </div>
                 <div className="border-t-2 border-l-2 border-b-2 border-gray-600 w-[60px] h-[60px]">
-                  {draftStep == 1 && selectedPick
-                    ? <Icons name={selectedPick} height={55} width={55} disable = {false} />
-                    : redTeamBans[0] ? <Icons name={redTeamBans[0]} height={55} width={55} disable = {false}/>
+                  {draftState.draftStep == 1 && draftState.selectedPick
+                    ? <Icons name={draftState.selectedPick} height={55} width={55} disable = {false} />
+                    : draftState.redTeamBans[0] ? <Icons name={draftState.redTeamBans[0]} height={55} width={55} disable = {false}/>
                     : null}
                 </div>
               </div>
             </div>
           </div>
           <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-            {selectedPick && <button className="bg-[#4dab74] text-black text-[25px] w-[256px] h-[58px] rounded-xl shadow-md hover:bg-[#237244]" onClick={() => handleLockIn()}>
+            {draftState.selectedPick && <button className="bg-[#4dab74] text-black text-[25px] w-[256px] h-[58px] rounded-xl shadow-md hover:bg-[#237244]" onClick={() => handleLockIn()}>
               Lock In
             </button>}
           </div>
           <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-            {draftCompletion && <button className="bg-[#4dab74] text-black text-[25px] w-[256px] h-[58px] rounded-xl shadow-md hover:bg-[#237244]" onClick={() => restartDraft()}>
+            {draftState.draftCompletion && <button className="bg-[#4dab74] text-black text-[25px] w-[256px] h-[58px] rounded-xl shadow-md hover:bg-[#237244]" onClick={() => restartDraft()}>
               Ready for Game
             </button>}
           </div>
