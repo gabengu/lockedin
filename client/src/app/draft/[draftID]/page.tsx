@@ -1,4 +1,5 @@
 "use client";
+import topLaneIcon from "../../../assests/role-icons/top_lane.svg"
 import { use, useEffect, useState } from "react";
 import Icons from "./icons.tsx";
 import SplashArt from "./splashArt.tsx";
@@ -7,6 +8,7 @@ import { notFound, useRouter } from "next/navigation"
 import { getDraft } from "../roomStore.ts";
 import Select from "@/components/select.tsx";
 import { set } from "better-auth";
+import Image from "next/image";
 
 type DraftData = {
   team1: string;
@@ -243,8 +245,12 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
         <div className="flex flex-col items-center">
           <div className=" flex flex-row justify-between w-[731px]">
             <div className=" flex flex-row w-[250px] justify-between items-center">
-              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
-              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
+              <div className="bg-[#40865d] w-[40px] h-[40px]">
+                <Image src={topLaneIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
+              </div>
+              <div className="bg-[#40865d] w-[40px] h-[40px]">
+                <Image src={topLaneIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
+              </div>
               <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
               <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
               <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
