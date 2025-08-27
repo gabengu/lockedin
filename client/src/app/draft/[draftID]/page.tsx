@@ -1,4 +1,5 @@
 "use client";
+import topLaneIcon from "../../../assets/role-icons/top_lane.svg"
 import topIcon from "../../../assets/role-icons/topIcon.svg"
 import jungleIcon from "../../../assets/role-icons/jungleIcon.svg"
 import midIcon from "../../../assets/role-icons/midIcon.svg"
