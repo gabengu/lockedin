@@ -1,5 +1,10 @@
 "use client";
-import topLaneIcon from "../../../assests/role-icons/top_lane.svg"
+import topIcon from "../../../assets/role-icons/topIcon.svg"
+import jungleIcon from "../../../assets/role-icons/jungleIcon.svg"
+import midIcon from "../../../assets/role-icons/midIcon.svg"
+import adIcon from "../../../assets/role-icons/adIcon.svg"
+import supportIcon from "../../../assets/role-icons/supportIcon.svg"
+import champRoles from "../../../assets/champion_roles.json"
 import { use, useEffect, useState } from "react";
 import Icons from "./icons.tsx";
 import SplashArt from "./splashArt.tsx";
@@ -111,6 +116,27 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
       else{
         setSelectedPick(champion)
       }
+    }
+  }
+
+  const handleRoleClick = (role: string) => {
+    if (role == "top") {
+      setFilterChampions(champRoles.all.top)
+    }
+    else if (role == "jungle") {
+      setFilterChampions(champRoles.all.jungle)
+    }
+    else if (role == "mid") {
+      setFilterChampions(champRoles.all.mid)
+    }
+    else if (role == "ad") {
+      setFilterChampions(champRoles.all.adc)
+    }
+    else if (role == "support") {
+      setFilterChampions(champRoles.all.support)
+    }
+    else {
+      setFilterChampions(allChampions)
     }
   }
 
@@ -245,15 +271,21 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
         <div className="flex flex-col items-center">
           <div className=" flex flex-row justify-between w-[731px]">
             <div className=" flex flex-row w-[250px] justify-between items-center">
-              <div className="bg-[#40865d] w-[40px] h-[40px]">
-                <Image src={topLaneIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("top")}>
+                <Image src={topIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
-              <div className="bg-[#40865d] w-[40px] h-[40px]">
-                <Image src={topLaneIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("jungle")}>
+                <Image src={jungleIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
-              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
-              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
-              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("mid")}>
+                <Image src={midIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
+              </div>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("ad")}>
+                <Image src={adIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
+              </div>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("support")}>
+                <Image src={supportIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
+              </div>
             </div>
               <div className="inline-block border-2 border-[#40865d]">
                 <input className="" type="text" id="myTextInput" name="myTextInput" />
