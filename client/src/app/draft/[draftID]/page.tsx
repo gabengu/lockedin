@@ -1,4 +1,5 @@
 "use client";
+import topLaneIcon from "../../../assests/role-icons/top_lane.svg";
 import { use, useEffect, useState } from "react";
 import TeamHeader from "@/components/draft/TeamHeader";
 import BlueTeamPanel from "@/components/draft/BlueTeamPanel";
@@ -13,6 +14,7 @@ import { draftOrder, DraftChamps } from "./draftOrder.tsx";
 import { notFound, useRouter } from "next/navigation";
 import { getDraft } from "../roomStore.ts";
 import { set } from "better-auth";
+import Image from "next/image";
 
 type DraftData = {
     team1: string;
