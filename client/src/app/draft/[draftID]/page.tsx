@@ -1,5 +1,5 @@
 "use client";
-import topLaneIcon from "../../../assests/role-icons/top_lane.svg"
+import topLaneIcon from "../../../assets/role-icons/top_lane.svg"
 import { use, useEffect, useState } from "react";
 import Icons from "./icons.tsx";
 import SplashArt from "./splashArt.tsx";
