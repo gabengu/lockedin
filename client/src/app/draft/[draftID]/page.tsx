@@ -385,12 +385,25 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
     }
   }
 
-  const handleRoleClick = (role: Role) => {
-    setRoleSelected(prev => (prev === role ? Role.none : role))
-  }
-
-  const handleSearch = (input: string) => {
-    setSearchChampion(input)
+  const handleRoleClick = (role: string) => {
+    if (role == "top") {
+      setFilterChampions(champRoles.all.top)
+    }
+    else if (role == "jungle") {
+      setFilterChampions(champRoles.all.jungle)
+    }
+    else if (role == "mid") {
+      setFilterChampions(champRoles.all.mid)
+    }
+    else if (role == "ad") {
+      setFilterChampions(champRoles.all.adc)
+    }
+    else if (role == "support") {
+      setFilterChampions(champRoles.all.support)
+    }
+    else {
+      setFilterChampions(allChampions)
+    }
   }
 
   const handleLockIn = () => {
@@ -524,20 +537,27 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
         <div className="flex flex-col items-center">
           <div className=" flex flex-row justify-between w-[731px]">
             <div className=" flex flex-row w-[250px] justify-between items-center">
-              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick(Role.top)}>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("top")}>
                 <Image src={topIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
-              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick(Role.jungle)}>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("jungle")}>
                 <Image src={jungleIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
-              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick(Role.mid)}>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("mid")}>
                 <Image src={midIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
-              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick(Role.adc)}>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("ad")}>
                 <Image src={adIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
-              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick(Role.support)}>
-                <Image src={supportIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
+              <div className="bg-[#40865d] w-[40px] h-[40px]">
+                <Image src={topLaneIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
+              </div>
+              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
+              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
+              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
+            </div>
+              <div className="inline-block border-2 border-[#40865d]">
+                <input className="" type="text" id="myTextInput" name="myTextInput" />
               </div>
             </div>
             <input className="border-1 border-[#40865d] rounded-md focus:border-[#40865d] focus:border-2 focus:outline-none text-white placeholder:pl-[4px] pl-[10]" type="text" id="myTextInput" name="myTextInput " placeholder="search by name" value={searchChampion} onChange={(e) => handleSearch(e.target.value)} />
