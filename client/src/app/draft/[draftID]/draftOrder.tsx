@@ -31,3 +31,13 @@ export const draftOrder: DraftAction[] = [
   { action: "pick", side: "red",  playerIndex: 5, index: 19 },
 ];
 
+export type DraftChamps = {
+  globalBans: (string | null)[]
+  blueTeamBans: (string | null)[]
+  redTeamBans: (string | null)[]
+  blueTeamPicks: (string | null)[]
+  redTeamPicks: (string | null)[]
+  draftStep: number
+  draftCompletion: boolean
+  selectedPick: string | null
+}
