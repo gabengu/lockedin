@@ -1,10 +1,14 @@
 "use client";
+<<<<<<< HEAD
 import topIcon from "../../../assets/role-icons/topIcon.svg"
 import jungleIcon from "../../../assets/role-icons/jungleIcon.svg"
 import midIcon from "../../../assets/role-icons/midIcon.svg"
 import adIcon from "../../../assets/role-icons/adIcon.svg"
 import supportIcon from "../../../assets/role-icons/supportIcon.svg"
 import champRoles from "../../../assets/champion_roles.json"
+=======
+import topLaneIcon from "../../../assets/role-icons/top_lane.svg"
+>>>>>>> 9f15eae (fix import)
 import { use, useEffect, useState } from "react";
 import TeamHeader from "@/components/draft/TeamHeader";
 import BlueTeamPanel from "@/components/draft/BlueTeamPanel";
