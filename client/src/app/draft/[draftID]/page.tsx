@@ -1,14 +1,10 @@
 "use client";
-<<<<<<< HEAD
 import topIcon from "../../../assets/role-icons/topIcon.svg"
 import jungleIcon from "../../../assets/role-icons/jungleIcon.svg"
 import midIcon from "../../../assets/role-icons/midIcon.svg"
 import adIcon from "../../../assets/role-icons/adIcon.svg"
 import supportIcon from "../../../assets/role-icons/supportIcon.svg"
 import champRoles from "../../../assets/champion_roles.json"
-=======
-import topLaneIcon from "../../../assets/role-icons/top_lane.svg"
->>>>>>> 9f15eae (fix import)
 import { use, useEffect, useState } from "react";
 import TeamHeader from "@/components/draft/TeamHeader";
 import BlueTeamPanel from "@/components/draft/BlueTeamPanel";
@@ -42,6 +38,21 @@ export default function DraftRoom({
 }) {
     const router = useRouter();
     const [draftData, setDraftData] = useState<DraftData>();
+
+enum Role {
+  top,
+  jungle,
+  mid,
+  adc,
+  support,
+  none
+}
+
+export default function DraftRoom({ params, }: { params: Promise<{ draftID: string }> }
+) {
+  const router = useRouter()
+  const [draftData, setDraftData] = useState<DraftData>()
+
 
     const [roomId, setRoomId] = useState<string>("");
     const [hasRole, setHasRole] = useState<boolean>(false);
@@ -102,6 +113,19 @@ export default function DraftRoom({
             next[index] = champion;
         }
         return next;
+
+  const [searchChampion, setSearchChampion] = useState<string>("");
+  const [roleSelected, setRoleSelected] = useState<Role>(Role.none);
+
+  useEffect(() => {
+    async function getData() {
+      const draftID = (await params).draftID
+      const draft = getDraft(draftID)
+      const draftInfo = (await draft)
+      if (draftInfo === undefined) {
+        router.push("/notfound")
+      }
+      setDraftData(draftInfo)
     }
 
     function setNull(array: (string | null)[]): (string | null)[] {
@@ -311,25 +335,28 @@ export default function DraftRoom({
     }
   }
 
-  const handleRoleClick = (role: string) => {
-    if (role == "top") {
+  const handleRoleClick = (role: Role) => {
+    if (role == roleSelected) {
+      setFilterChampions(allChampions)
+      setRoleSelected(Role.none)
+      return
+    }
+    else if (role == Role.top) {
       setFilterChampions(champRoles.all.top)
     }
-    else if (role == "jungle") {
+    else if (role == Role.jungle) {
       setFilterChampions(champRoles.all.jungle)
     }
-    else if (role == "mid") {
+    else if (role == Role.mid) {
       setFilterChampions(champRoles.all.mid)
     }
-    else if (role == "ad") {
+    else if (role == Role.adc) {
       setFilterChampions(champRoles.all.adc)
     }
-    else if (role == "support") {
+    else if (role == Role.support) {
       setFilterChampions(champRoles.all.support)
     }
-    else {
-      setFilterChampions(allChampions)
-    }
+    setRoleSelected(role)
   }
 
   const handleLockIn = () => {
@@ -463,25 +490,23 @@ export default function DraftRoom({
         <div className="flex flex-col items-center">
           <div className=" flex flex-row justify-between w-[731px]">
             <div className=" flex flex-row w-[250px] justify-between items-center">
-              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("top")}>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick(Role.top)}>
                 <Image src={topIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
-              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("jungle")}>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick(Role.jungle)}>
                 <Image src={jungleIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
-              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("mid")}>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick(Role.mid)}>
                 <Image src={midIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
-              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("ad")}>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick(Role.adc)}>
                 <Image src={adIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
-              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("support")}>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick(Role.support)}>
                 <Image src={supportIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
             </div>
-              <div className="inline-block border-2 border-[#40865d]">
-                <input className="" type="text" id="myTextInput" name="myTextInput" />
-              </div>
+            <input className="border-1 border-[#40865d] rounded-md focus:border-[#40865d] focus:border-2 focus:outline-none text-white placeholder:pl-[4px] pl-[10]" type="text" id="myTextInput" name="myTextInput " placeholder="search by name" value={searchChampion} onChange={(e) => setSearchChampion(e.target.value)} />
           </div>
 
           <div className=" flex flex-wrap overflow-y-auto w-[800px] h-[calc(100vh-180px)] items-center justify-center hide-scrollbar">{renderIcons()}</div>
