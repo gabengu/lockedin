@@ -31,23 +31,6 @@ type PageProps = {
     draftID: string;
 };
 
-export default function DraftRoom({
-    params,
-}: {
-    params: Promise<{ draftID: string }>;
-}) {
-    const router = useRouter();
-    const [draftData, setDraftData] = useState<DraftData>();
-
-enum Role {
-  top,
-  jungle,
-  mid,
-  adc,
-  support,
-  none
-}
-
 export default function DraftRoom({ params, }: { params: Promise<{ draftID: string }> }
 ) {
   const router = useRouter()
@@ -61,65 +44,16 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
     const [filterChampions, setFilterChampions] = useState<string[]>([]);
     const [activeSide, setActiveSide] = useState<"blue" | "red">("blue");
 
-    const [draftState, setDraftState] = useState<DraftChamps>({
-        globalBans: [],
-        blueTeamBans: new Array(5).fill(null),
-        redTeamBans: new Array(5).fill(null),
-        blueTeamPicks: new Array(5).fill(null),
-        redTeamPicks: new Array(5).fill(null),
-        draftStep: 20,
-        draftCompletion: true,
-        selectedPick: null,
-    });
+  const [selectedPick, setSelectedPick] = useState<string | null>(null);
 
-    useEffect(() => {
-        async function getData() {
-            const draftID = (await params).draftID;
-            const draft = getDraft(draftID);
-            const draftInfo = await draft;
-            if (draftInfo === undefined) {
-                router.push("/notfound");
-            }
-            setDraftData(draftInfo);
-            setRoomId(draftID);
-        }
-        async function getAllChampions() {
-            const response = await fetch(
-                "https://ddragon.leagueoflegends.com/cdn/13.20.1/data/en_US/champion.json",
-            );
-            if (!response.ok) {
-                throw new Error("Failed to fetch champions");
-            }
-            const data = await response.json();
-            setAllChampions(Object.keys(data.data));
-            setFilterChampions(Object.keys(data.data));
-        }
-        getAllChampions();
-        getData();
-    }, []);
+  const [globalBans, setGlobalBans] = useState<(string | null)[]>([]);
+  const [blueTeamPicks, setBlueTeamPicks] = useState(new Array(5).fill(null));
+  const [redTeamPicks, setRedTeamPicks] = useState(new Array(5).fill(null));
+  const [blueTeamBans, setBlueTeamBans] = useState(new Array(5).fill(null));
+  const [redTeamBans, setRedTeamBans] = useState(new Array(5).fill(null));
 
-    const renderIcons = () => {
-        // Deprecated: replaced by ChampionGrid
-        return null;
-    };
-
-    function addChampion(
-        array: (string | null)[],
-        champion: string | null,
-    ): (string | null)[] {
-        const next = [...array];
-        const index = next.findIndex((e) => e === null);
-        if (index !== -1) {
-            next[index] = champion;
-        }
-        return next;
-
-  const [searchChampion, setSearchChampion] = useState<string>("");
-  const [filterChampions, setFilterChampions] = useState<string[]>([]);
-  let roleFilterChampions: string[] = []
-  let searchFilterChampions: string[] = []
-
-  const [roleSelected, setRoleSelected] = useState<Role>(Role.none);
+  const [draftStep, setDraftStep] = useState<number>(20);
+  const [draftCompletion, setDraftCompletion] = useState<boolean>(true);
 
   useEffect(() => {
     async function getData() {
@@ -549,18 +483,14 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
               <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("ad")}>
                 <Image src={adIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
-              <div className="bg-[#40865d] w-[40px] h-[40px]">
-                <Image src={topLaneIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
+              <div className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px]" onClick={() => handleRoleClick("support")}>
+                <Image src={supportIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
-              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
-              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
-              <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
             </div>
+<<<<<<< HEAD
               <div className="inline-block border-2 border-[#40865d]">
                 <input className="" type="text" id="myTextInput" name="myTextInput" />
               </div>
-            </div>
-            <input className="border-1 border-[#40865d] rounded-md focus:border-[#40865d] focus:border-2 focus:outline-none text-white placeholder:pl-[4px] pl-[10]" type="text" id="myTextInput" name="myTextInput " placeholder="search by name" value={searchChampion} onChange={(e) => handleSearch(e.target.value)} />
           </div>
 
           <div className=" flex flex-wrap overflow-y-auto w-[800px] h-[calc(100vh-180px)] items-center justify-center hide-scrollbar">{renderIcons()}</div>
