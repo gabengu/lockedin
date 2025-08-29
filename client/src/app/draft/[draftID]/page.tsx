@@ -116,8 +116,9 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
 
   const [searchChampion, setSearchChampion] = useState<string>("");
   const [filterChampions, setFilterChampions] = useState<string[]>([]);
-  const [roleFilterChampions, setRoleFilterChampions] = useState<string[]>([]);
-  const [searchFilterChampions, setSearchFilterChampions] = useState<string[]>([]);
+  let roleFilterChampions: string[] = []
+  let searchFilterChampions: string[] = []
+
   const [roleSelected, setRoleSelected] = useState<Role>(Role.none);
 
   useEffect(() => {
@@ -301,6 +302,52 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
                 </div>
             )}
         </>
+    async function getAllChampions() {
+      const response = await fetch(
+        "https://ddragon.leagueoflegends.com/cdn/13.20.1/data/en_US/champion.json"
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch champions");
+      }
+      const data = await response.json();
+      setAllChampions(Object.keys(data.data));
+      setFilterChampions(Object.keys(data.data));
+      searchFilterChampions = Object.keys(data.data)
+      roleFilterChampions = Object.keys(data.data)
+      console.log("on start up roleFilterChampions: " + roleFilterChampions)
+      console.log("on start up searchFilterChampions: " + searchFilterChampions)
+    }
+    getAllChampions();
+    getData()
+  }, [])
+
+  useEffect(() => {
+    let roleFiltered: string[] = allChampions;
+    if (roleSelected !== Role.none) {
+      if (roleSelected === Role.top) roleFiltered = champRoles.all.top;
+      if (roleSelected === Role.jungle) roleFiltered = champRoles.all.jungle;
+      if (roleSelected === Role.mid) roleFiltered = champRoles.all.mid;
+      if (roleSelected === Role.adc) roleFiltered = champRoles.all.adc;
+      if (roleSelected === Role.support) roleFiltered = champRoles.all.support;
+    }
+
+    const finalFiltered = roleFiltered.filter(champion =>
+      champion.toLowerCase().startsWith(searchChampion.toLowerCase())
+    );
+
+    setFilterChampions(finalFiltered);
+  }, [searchChampion, roleSelected, allChampions]);
+
+  const renderIcons = () => {
+    return filterChampions.map(
+      (name: string, index: number) => {
+        return (
+          <div
+            key={name}
+            className="m-1 rounded hover:scale-[105%] transition-all cursor-pointer" onClick={() => handleChampionClick(name, activeSide)}>
+            <Icons key={index} name={name} disable={false} height={75} width={75} />
+          </div>)
+      }
     );
   }
 
@@ -339,39 +386,12 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
   }
 
   const handleRoleClick = (role: Role) => {
-    if (role == roleSelected) {
-      setRoleFilterChampions(allChampions)
-      setRoleSelected(Role.none)
-      setFilterChampions(roleFilterChampions)
-      console.log("none was ")
-      return
-    }
-    else if (role == Role.top) {
-      setRoleFilterChampions(champRoles.all.top)
-    }
-    else if (role == Role.jungle) {
-      setRoleFilterChampions(champRoles.all.jungle)
-    }
-    else if (role == Role.mid) {
-      setRoleFilterChampions(champRoles.all.mid)
-    }
-    else if (role == Role.adc) {
-      setRoleFilterChampions(champRoles.all.adc)
-    }
-    else if (role == Role.support) {
-      setRoleFilterChampions(champRoles.all.support)
-    }
-    setRoleSelected(role)
-    setFilterChampions(roleFilterChampions)
+    setRoleSelected(prev => (prev === role ? Role.none : role))
   }
 
   const handleSearch = (input: string) => {
     setSearchChampion(input)
-    setSearchFilterChampions(allChampions.filter((champion)=>{
-      return champion.startsWith(searchChampion)
-    }))
   }
-
 
   const handleLockIn = () => {
     const step = draftOrder[draftStep];
