@@ -115,6 +115,9 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
         return next;
 
   const [searchChampion, setSearchChampion] = useState<string>("");
+  const [filterChampions, setFilterChampions] = useState<string[]>([]);
+  const [roleFilterChampions, setRoleFilterChampions] = useState<string[]>([]);
+  const [searchFilterChampions, setSearchFilterChampions] = useState<string[]>([]);
   const [roleSelected, setRoleSelected] = useState<Role>(Role.none);
 
   useEffect(() => {
@@ -337,27 +340,38 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
 
   const handleRoleClick = (role: Role) => {
     if (role == roleSelected) {
-      setFilterChampions(allChampions)
+      setRoleFilterChampions(allChampions)
       setRoleSelected(Role.none)
+      setFilterChampions(roleFilterChampions)
+      console.log("none was ")
       return
     }
     else if (role == Role.top) {
-      setFilterChampions(champRoles.all.top)
+      setRoleFilterChampions(champRoles.all.top)
     }
     else if (role == Role.jungle) {
-      setFilterChampions(champRoles.all.jungle)
+      setRoleFilterChampions(champRoles.all.jungle)
     }
     else if (role == Role.mid) {
-      setFilterChampions(champRoles.all.mid)
+      setRoleFilterChampions(champRoles.all.mid)
     }
     else if (role == Role.adc) {
-      setFilterChampions(champRoles.all.adc)
+      setRoleFilterChampions(champRoles.all.adc)
     }
     else if (role == Role.support) {
-      setFilterChampions(champRoles.all.support)
+      setRoleFilterChampions(champRoles.all.support)
     }
     setRoleSelected(role)
+    setFilterChampions(roleFilterChampions)
   }
+
+  const handleSearch = (input: string) => {
+    setSearchChampion(input)
+    setSearchFilterChampions(allChampions.filter((champion)=>{
+      return champion.startsWith(searchChampion)
+    }))
+  }
+
 
   const handleLockIn = () => {
     const step = draftOrder[draftStep];
@@ -506,7 +520,7 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
                 <Image src={supportIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
             </div>
-            <input className="border-1 border-[#40865d] rounded-md focus:border-[#40865d] focus:border-2 focus:outline-none text-white placeholder:pl-[4px] pl-[10]" type="text" id="myTextInput" name="myTextInput " placeholder="search by name" value={searchChampion} onChange={(e) => setSearchChampion(e.target.value)} />
+            <input className="border-1 border-[#40865d] rounded-md focus:border-[#40865d] focus:border-2 focus:outline-none text-white placeholder:pl-[4px] pl-[10]" type="text" id="myTextInput" name="myTextInput " placeholder="search by name" value={searchChampion} onChange={(e) => handleSearch(e.target.value)} />
           </div>
 
           <div className=" flex flex-wrap overflow-y-auto w-[800px] h-[calc(100vh-180px)] items-center justify-center hide-scrollbar">{renderIcons()}</div>
