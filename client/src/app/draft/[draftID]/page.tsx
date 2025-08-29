@@ -57,8 +57,9 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
 
   const [searchChampion, setSearchChampion] = useState<string>("");
   const [filterChampions, setFilterChampions] = useState<string[]>([]);
-  const [roleFilterChampions, setRoleFilterChampions] = useState<string[]>([]);
-  const [searchFilterChampions, setSearchFilterChampions] = useState<string[]>([]);
+  let roleFilterChampions: string[] = []
+  let searchFilterChampions: string[] = []
+
   const [roleSelected, setRoleSelected] = useState<Role>(Role.none);
 
   useEffect(() => {
@@ -326,39 +327,12 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
   }
 
   const handleRoleClick = (role: Role) => {
-    if (role == roleSelected) {
-      setRoleFilterChampions(allChampions)
-      setRoleSelected(Role.none)
-      setFilterChampions(roleFilterChampions)
-      console.log("none was ")
-      return
-    }
-    else if (role == Role.top) {
-      setRoleFilterChampions(champRoles.all.top)
-    }
-    else if (role == Role.jungle) {
-      setRoleFilterChampions(champRoles.all.jungle)
-    }
-    else if (role == Role.mid) {
-      setRoleFilterChampions(champRoles.all.mid)
-    }
-    else if (role == Role.adc) {
-      setRoleFilterChampions(champRoles.all.adc)
-    }
-    else if (role == Role.support) {
-      setRoleFilterChampions(champRoles.all.support)
-    }
-    setRoleSelected(role)
-    setFilterChampions(roleFilterChampions)
+    setRoleSelected(prev => (prev === role ? Role.none : role))
   }
 
   const handleSearch = (input: string) => {
     setSearchChampion(input)
-    setSearchFilterChampions(allChampions.filter((champion)=>{
-      return champion.startsWith(searchChampion)
-    }))
   }
-
 
   const handleLockIn = () => {
     const step = draftOrder[draftStep];
