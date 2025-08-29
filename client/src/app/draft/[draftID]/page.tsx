@@ -55,6 +55,12 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
   const [draftStep, setDraftStep] = useState<number>(20);
   const [draftCompletion, setDraftCompletion] = useState<boolean>(true);
 
+  const [searchChampion, setSearchChampion] = useState<string>("");
+  const [filterChampions, setFilterChampions] = useState<string[]>([]);
+  const [roleFilterChampions, setRoleFilterChampions] = useState<string[]>([]);
+  const [searchFilterChampions, setSearchFilterChampions] = useState<string[]>([]);
+  const [roleSelected, setRoleSelected] = useState<Role>(Role.none);
+
   useEffect(() => {
     async function getData() {
       const draftID = (await params).draftID
@@ -319,26 +325,40 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
     }
   }
 
-  const handleRoleClick = (role: string) => {
-    if (role == "top") {
-      setFilterChampions(champRoles.all.top)
+  const handleRoleClick = (role: Role) => {
+    if (role == roleSelected) {
+      setRoleFilterChampions(allChampions)
+      setRoleSelected(Role.none)
+      setFilterChampions(roleFilterChampions)
+      console.log("none was ")
+      return
     }
-    else if (role == "jungle") {
-      setFilterChampions(champRoles.all.jungle)
+    else if (role == Role.top) {
+      setRoleFilterChampions(champRoles.all.top)
     }
-    else if (role == "mid") {
-      setFilterChampions(champRoles.all.mid)
+    else if (role == Role.jungle) {
+      setRoleFilterChampions(champRoles.all.jungle)
     }
-    else if (role == "ad") {
-      setFilterChampions(champRoles.all.adc)
+    else if (role == Role.mid) {
+      setRoleFilterChampions(champRoles.all.mid)
     }
-    else if (role == "support") {
-      setFilterChampions(champRoles.all.support)
+    else if (role == Role.adc) {
+      setRoleFilterChampions(champRoles.all.adc)
     }
-    else {
-      setFilterChampions(allChampions)
+    else if (role == Role.support) {
+      setRoleFilterChampions(champRoles.all.support)
     }
+    setRoleSelected(role)
+    setFilterChampions(roleFilterChampions)
   }
+
+  const handleSearch = (input: string) => {
+    setSearchChampion(input)
+    setSearchFilterChampions(allChampions.filter((champion)=>{
+      return champion.startsWith(searchChampion)
+    }))
+  }
+
 
   const handleLockIn = () => {
     const step = draftOrder[draftStep];
@@ -487,10 +507,7 @@ export default function DraftRoom({ params, }: { params: Promise<{ draftID: stri
                 <Image src={supportIcon} alt="Top Lane" width={30} height={30} className="m-auto"/>
               </div>
             </div>
-<<<<<<< HEAD
-              <div className="inline-block border-2 border-[#40865d]">
-                <input className="" type="text" id="myTextInput" name="myTextInput" />
-              </div>
+            <input className="border-1 border-[#40865d] rounded-md focus:border-[#40865d] focus:border-2 focus:outline-none text-white placeholder:pl-[4px] pl-[10]" type="text" id="myTextInput" name="myTextInput " placeholder="search by name" value={searchChampion} onChange={(e) => handleSearch(e.target.value)} />
           </div>
 
           <div className=" flex flex-wrap overflow-y-auto w-[800px] h-[calc(100vh-180px)] items-center justify-center hide-scrollbar">{renderIcons()}</div>
