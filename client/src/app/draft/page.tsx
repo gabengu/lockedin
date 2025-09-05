@@ -129,7 +129,7 @@ export default function Draft() {
                         className="px-4 py-2 bg-gray-700 text-white rounded"
                     >
                         Copy Draft Link
-                    </button>
+                    </button>  
                     <button
                         onClick={() => router.push("/draft/" + draftLink)}
                         className="px-4 py-2 bg-blue-600 text-white rounded"
