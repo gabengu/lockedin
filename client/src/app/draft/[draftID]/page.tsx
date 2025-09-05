@@ -6,12 +6,12 @@ import RedTeamPanel from "@/components/draft/RedTeamPanel";
 import ChampionGrid from "@/components/draft/ChampionGrid";
 import LockInButton from "@/components/draft/LockInButton";
 import ReadyForGameButton from "@/components/draft/ReadyForGameButton";
+import SelectRole from "@/components/draft/SelectRole";
 import Icons from "./icons.tsx";
 import SplashArt from "./splashArt.tsx";
 import { draftOrder, DraftChamps } from "./draftOrder.tsx";
 import { notFound, useRouter } from "next/navigation";
 import { getDraft } from "../roomStore.ts";
-import Select from "@/components/select.tsx";
 import { set } from "better-auth";
 
 type DraftData = {
@@ -33,6 +33,7 @@ export default function DraftRoom({
     const [draftData, setDraftData] = useState<DraftData>();
 
     const [roomId, setRoomId] = useState<string>("");
+    const [hasRole, setHasRole] = useState<boolean>(false);
 
     const [allChampions, setAllChampions] = useState<string[]>([]);
     const [filterChampions, setFilterChampions] = useState<string[]>([]);
@@ -53,11 +54,12 @@ export default function DraftRoom({
         async function getData() {
             const draftID = (await params).draftID;
             const draft = getDraft(draftID);
-            const draftLink = await draft;
-            if (draftLink === undefined) {
+            const draftInfo = await draft;
+            if (draftInfo === undefined) {
                 router.push("/notfound");
             }
-            setDraftData(draftLink);
+            setDraftData(draftInfo);
+            setRoomId(draftID);
         }
         async function getAllChampions() {
             const response = await fetch(
@@ -213,7 +215,10 @@ export default function DraftRoom({
 
     return (
         <>
-            {draftData && (
+            {!hasRole && (
+                <SelectRole roomId={roomId} onClick={() => setHasRole(true)} />
+            )}
+            {draftData && hasRole && (
                 <div className="flex flex-col bg-black min-h-screen">
                     <TeamHeader
                         team1={draftData.team1}

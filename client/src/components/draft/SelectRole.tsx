@@ -12,11 +12,12 @@ type teamInfo = {
     spectators: number;
 };
 
-type room = {
+type selectRoleType = {
     roomId: string;
+    onClick: () => void;
 };
 
-export default function Select({ roomId }: room) {
+export default function Select({ roomId, onClick }: selectRoleType) {
     //const [redDrafter, setRedDrafter] = useState("");
     const socketRef = useRef<Socket>(null);
     useEffect(() => {
@@ -34,34 +35,37 @@ export default function Select({ roomId }: room) {
         };
     }, [roomId]);
 
-    const redClicked = () => {
+    const handleRedClick = () => {
         socketRef.current?.emit("send_red", {
             message: "RED PICKED",
             room: roomId,
         });
+        onClick();
     };
-    const blueClicked = () => {
+    const handleblueClick = () => {
         socketRef.current?.emit("send_blue", {
             message: "BLUE PICKED",
             room: roomId,
         });
+        onClick();
     };
-    const specClicked = () => {
+    const handleSpecClick = () => {
         socketRef.current?.emit("send_spec", {
             message: "SPEC CLICKED",
             room: roomId,
         });
+        onClick();
     };
 
     return (
         <>
-            <button className="bg-red-500" onClick={redClicked}>
+            <button className="bg-red-500" onClick={handleRedClick}>
                 Red
             </button>
-            <button className="bg-blue-500" onClick={blueClicked}>
+            <button className="bg-blue-500" onClick={handleblueClick}>
                 Blue
             </button>
-            <button className="bg-purple-500" onClick={specClicked}>
+            <button className="bg-purple-500" onClick={handleSpecClick}>
                 Spectator
             </button>
         </>
