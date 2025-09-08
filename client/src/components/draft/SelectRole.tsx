@@ -74,7 +74,6 @@ export default function Select({ roomId, onClick }: selectRoleType) {
             room: roomId,
             myID: socketRef.current.id,
         });
-        //onClick();
     };
     const handleblueClick = () => {
         socketRef.current?.emit("send_blue", {
@@ -82,7 +81,6 @@ export default function Select({ roomId, onClick }: selectRoleType) {
             room: roomId,
             myID: socketRef.current.id,
         });
-        //onClick();
     };
     const handleSpecClick = () => {
         socketRef.current?.emit("send_spec", {

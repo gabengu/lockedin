@@ -16,8 +16,6 @@ const roomInfo: string[] = [];
 
 io.on("connection", (socket: Socket) => {
 
-    //console.log(socket.id);
-
     // recieves a callback function from the client
     // basically client waits for a response and then re-renders the page once it recieves drafter info
     socket.on("join-room", (data, callback) => {
@@ -51,7 +49,6 @@ io.on("connection", (socket: Socket) => {
         if (roomBlueDrafters[data.room] == undefined) {
             roomBlueDrafters[data.room] = data.myID;
             io.to(data.myID).emit("recieve_message", {message: "blue take"});
-            console.log(roomBlueDrafters[data.room]);
         }
         else {
             io.to(data.myID).emit("recieve_message", {message: "Blue already taken"});
