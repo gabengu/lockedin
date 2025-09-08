@@ -100,17 +100,17 @@ export default function Select({ roomId, onClick }: selectRoleType) {
                     </button>
                 </>
                     )}
-            {blueDrafter && (
-                <>
-                    <button className="bg-slate-500" onClick={handleblueClick}>
-                        Blue
-                    </button>
-                </>
-            )}
             {!redDrafter && (
                 <>
                     <button className="bg-red-500" onClick={handleRedClick}>
                         Red
+                    </button>
+                </>
+            )}
+            {blueDrafter && (
+                <>
+                    <button className="bg-slate-500" onClick={handleblueClick}>
+                        Blue
                     </button>
                 </>
             )}
