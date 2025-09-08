@@ -29,23 +29,31 @@ export default function Select({ roomId, onClick }: selectRoleType) {
     const socketRef = useRef<Socket>(null);
     useEffect(() => {
         socketRef.current = io("http://localhost:3001");
+
+        // first thing a client does when opening page
         socketRef.current.emit("join-room", {
             message: "ROOM JOINED",
             room: roomId,
             myID: socketRef.current.id,
+            // sends a callback function to set the client side drafter info
+            // needed for grey buttons
         }, (response:drafters) => {
             setRedDrafter(response.redDrafter === "" ? false : true);
             setBlueDrafter(response.blueDrafter === "" ? false : true);
         });
+
+        // this is the general function for all message recieving from server
         socketRef.current.on("recieve_message", (data) => {
-            if (data.message == "Room Joined") {
-            }
-            else if (data.message == "red take") {
+
+            // server has allowed this client to take red
+            if (data.message == "red take") {
+                // render draft page
                 onClick();
             }
             else if (data.message == "blue take") {
                 onClick();
             }
+            // red has already been taken. they get an alert and the button should have been grey anyways
             else if (data.message == "Red already taken") {
                 alert("Red Drafter already taken");
             }
@@ -59,6 +67,7 @@ export default function Select({ roomId, onClick }: selectRoleType) {
         };
     }, [roomId, redDrafter, blueDrafter]);
 
+    // red was clicked
     const handleRedClick = () => {
         socketRef.current?.emit("send_red", {
             message: "RED PICKED",
@@ -84,6 +93,7 @@ export default function Select({ roomId, onClick }: selectRoleType) {
     };
 
     return (
+        // has conditional rendering to grey out buttons if drafter already taken
         <>
             {redDrafter && (
                 <>

@@ -6,38 +6,47 @@ const io = require("socket.io")(3001, {
     },
 });
 
-
+// key = room
+// returns drafter's socket id
 const roomRedDrafters: { [key: string]: string } = {};
 const roomBlueDrafters: { [key: string]: string } = {};
+
+// stores list of all open rooms
 const roomInfo: string[] = [];
 
 io.on("connection", (socket: Socket) => {
 
     //console.log(socket.id);
 
+    // recieves a callback function from the client
+    // basically client waits for a response and then re-renders the page once it recieves drafter info
     socket.on("join-room", (data, callback) => {
         socket.join(data.room);
+        // add room info to list of rooms if it does not exist
         if (!roomInfo[data.room]) {
             roomInfo.push(data.room);
         }
+        // client waits for this info
         callback({
             redDrafter: roomRedDrafters[data.room] ? roomRedDrafters[data.room] : "",
             blueDrafter: roomBlueDrafters[data.room] ? roomBlueDrafters[data.room] : ""
         });
-        //console.log(roomRedDrafters[data.room]);
-
-        //console.log(data.message + data.room);
     });
+
+    // recieves "send red" from client
     socket.on("send_red", (data) => {
+        // checks if theres a red drafter 
         if (roomRedDrafters[data.room] == undefined) {
+            // if not set requesting client as red drafter
             roomRedDrafters[data.room] = data.myID;
             io.to(data.myID).emit("recieve_message", {message: "red take"});
-            console.log(roomRedDrafters[data.room]);
         }
         else {
+            // else notify the user they cannot take red
             io.to(data.myID).emit("recieve_message", {message: "Red already taken"});
         }
     });
+    // same as red
     socket.on("send_blue", (data) => {
         if (roomBlueDrafters[data.room] == undefined) {
             roomBlueDrafters[data.room] = data.myID;
@@ -48,6 +57,7 @@ io.on("connection", (socket: Socket) => {
             io.to(data.myID).emit("recieve_message", {message: "Blue already taken"});
         }
     });
+    // no special cases for spectator yet
     socket.on("send_spec", (data) => {
         io.to(data.myID).emit("recieve_message", data);
     });
