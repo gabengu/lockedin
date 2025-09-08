@@ -17,12 +17,15 @@ type selectRoleType = {
     onClick: () => void;
 };
 
-
+type drafters = {
+    redDrafter: string;
+    blueDrafter: string;
+}
 
 
 export default function Select({ roomId, onClick }: selectRoleType) {
-    const [redDrafter, setRedDrafter] = useState<string>("");
-    const [blueDrafter, setBlueDrafter] = useState<string>("");
+    const [redDrafter, setRedDrafter] = useState<boolean>(false);
+    const [blueDrafter, setBlueDrafter] = useState<boolean>(false);
     const socketRef = useRef<Socket>(null);
     useEffect(() => {
         socketRef.current = io("http://localhost:3001");
@@ -30,6 +33,9 @@ export default function Select({ roomId, onClick }: selectRoleType) {
             message: "ROOM JOINED",
             room: roomId,
             myID: socketRef.current.id,
+        }, (response:drafters) => {
+            setRedDrafter(response.redDrafter === "" ? false : true);
+            setBlueDrafter(response.blueDrafter === "" ? false : true);
         });
         socketRef.current.on("recieve_message", (data) => {
             if (data.message == "Room Joined") {
@@ -51,7 +57,7 @@ export default function Select({ roomId, onClick }: selectRoleType) {
             socketRef.current?.off("recieve_message");
             socketRef.current?.disconnect();
         };
-    }, [roomId]);
+    }, [roomId, redDrafter, blueDrafter]);
 
     const handleRedClick = () => {
         socketRef.current?.emit("send_red", {
@@ -79,15 +85,38 @@ export default function Select({ roomId, onClick }: selectRoleType) {
 
     return (
         <>
-            <button className="bg-red-500 disabled:bg-slate-500" onClick={handleRedClick} disabled={redDrafter != ""}>
-                Red
-            </button>
-            <button className="bg-blue-500 disabled:bg-slate-500" onClick={handleblueClick} disabled={blueDrafter != ""}>
-                Blue
-            </button>
+            {redDrafter && (
+                <>
+                    <button className="bg-slate-500" onClick={handleRedClick}>
+                        Red
+                    </button>
+                </>
+                    )}
+            {blueDrafter && (
+                <>
+                    <button className="bg-slate-500" onClick={handleblueClick}>
+                        Blue
+                    </button>
+                </>
+            )}
+            {!redDrafter && (
+                <>
+                    <button className="bg-red-500" onClick={handleRedClick}>
+                        Red
+                    </button>
+                </>
+            )}
+            {!blueDrafter && (
+                <>
+                    <button className="bg-blue-500" onClick={handleblueClick}>
+                        Blue
+                    </button>
+                </>
+            )}
             <button className="bg-purple-500" onClick={handleSpecClick}>
                 Spectator
             </button>
         </>
     );
+
 }

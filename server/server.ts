@@ -15,11 +15,15 @@ io.on("connection", (socket: Socket) => {
 
     //console.log(socket.id);
 
-    socket.on("join-room", (data) => {
+    socket.on("join-room", (data, callback) => {
         socket.join(data.room);
         if (!roomInfo[data.room]) {
             roomInfo.push(data.room);
         }
+        callback({
+            redDrafter: roomRedDrafters[data.room] ? roomRedDrafters[data.room] : "",
+            blueDrafter: roomBlueDrafters[data.room] ? roomBlueDrafters[data.room] : ""
+        });
         //console.log(roomRedDrafters[data.room]);
 
         //console.log(data.message + data.room);
@@ -45,6 +49,6 @@ io.on("connection", (socket: Socket) => {
         }
     });
     socket.on("send_spec", (data) => {
-        socket.to(data.room).emit("recieve_message", data);
+        io.to(data.myID).emit("recieve_message", data);
     });
 }); 
