@@ -38,6 +38,8 @@ io.on("connection", (socket: Socket) => {
             // if not set requesting client as red drafter
             roomRedDrafters[data.room] = data.myID;
             io.to(data.myID).emit("recieve_message", {message: "red take"});
+            // tell the rest red was taken
+            socket.to(data.room).emit("recieve_message", {message: "i took red"});
         }
         else {
             // else notify the user they cannot take red
@@ -49,6 +51,8 @@ io.on("connection", (socket: Socket) => {
         if (roomBlueDrafters[data.room] == undefined) {
             roomBlueDrafters[data.room] = data.myID;
             io.to(data.myID).emit("recieve_message", {message: "blue take"});
+            // tell the rest blue was taken
+            socket.to(data.room).emit("recieve_message", {message: "i took blue"});
         }
         else {
             io.to(data.myID).emit("recieve_message", {message: "Blue already taken"});

@@ -60,6 +60,12 @@ export default function Select({ roomId, onClick }: selectRoleType) {
             else if (data.message == "Blue already taken") {
                 alert("Blue Drafter already taken");
             }
+            else if (data.message == "i took red") {
+                setRedDrafter(true);
+            }
+            else if (data.message == "i took blue") {
+                setBlueDrafter(true);
+            }
         });
         return () => {
             socketRef.current?.off("recieve_message");
