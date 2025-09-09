@@ -3,6 +3,7 @@
 import io from "socket.io-client";
 import { useEffect, useState, useRef } from "react";
 import { Socket } from "socket.io-client";
+import RedBlueButton from "./RedBlueButton";
 
 type teamInfo = {
     redDrafter: boolean;
@@ -81,7 +82,7 @@ export default function Select({ roomId, onClick }: selectRoleType) {
             myID: socketRef.current.id,
         });
     };
-    const handleblueClick = () => {
+    const handleBlueClick = () => {
         socketRef.current?.emit("send_blue", {
             message: "BLUE PICKED",
             room: roomId,
@@ -100,36 +101,18 @@ export default function Select({ roomId, onClick }: selectRoleType) {
         // has conditional rendering to grey out buttons if drafter already taken
         <>
             {redDrafter && (
-                <>
-                    <button className="bg-slate-500" onClick={handleRedClick}>
-                        Red
-                    </button>
-                </>
-                    )}
+                <RedBlueButton side="Red" colourCode="bg-slate-500" function={handleRedClick} />
+                )}
             {!redDrafter && (
-                <>
-                    <button className="bg-red-500" onClick={handleRedClick}>
-                        Red
-                    </button>
-                </>
+                <RedBlueButton side="Red" colourCode="bg-red-500" function={handleRedClick} />
             )}
             {blueDrafter && (
-                <>
-                    <button className="bg-slate-500" onClick={handleblueClick}>
-                        Blue
-                    </button>
-                </>
+                <RedBlueButton side="Blue" colourCode="bg-slate-500" function={handleBlueClick} />
             )}
             {!blueDrafter && (
-                <>
-                    <button className="bg-blue-500" onClick={handleblueClick}>
-                        Blue
-                    </button>
-                </>
+                <RedBlueButton side="Blue" colourCode="bg-blue-500" function={handleBlueClick} />
             )}
-            <button className="bg-purple-500" onClick={handleSpecClick}>
-                Spectator
-            </button>
+            <RedBlueButton side="Spectator" colourCode="bg-purple-500" function={handleSpecClick} />
         </>
     );
 
