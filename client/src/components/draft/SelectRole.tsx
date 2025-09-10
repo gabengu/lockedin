@@ -4,6 +4,8 @@ import io from "socket.io-client";
 import { useEffect, useState, useRef } from "react";
 import { Socket } from "socket.io-client";
 import RedBlueButton from "./RedBlueButton";
+import SpectatorButton from "./SpectatorButton";
+import Navbar from "../navbar";
 
 type teamInfo = {
     redDrafter: boolean;
@@ -99,21 +101,37 @@ export default function Select({ roomId, onClick }: selectRoleType) {
 
     return (
         // has conditional rendering to grey out buttons if drafter already taken
-        <>
-            {redDrafter && (
-                <RedBlueButton side="Red" colourCode="bg-slate-500" function={handleRedClick} />
-                )}
-            {!redDrafter && (
-                <RedBlueButton side="Red" colourCode="bg-red-500" function={handleRedClick} />
-            )}
-            {blueDrafter && (
-                <RedBlueButton side="Blue" colourCode="bg-slate-500" function={handleBlueClick} />
-            )}
-            {!blueDrafter && (
-                <RedBlueButton side="Blue" colourCode="bg-blue-500" function={handleBlueClick} />
-            )}
-            <RedBlueButton side="Spectator" colourCode="bg-purple-500" function={handleSpecClick} />
-        </>
+        <div className="flex flex-col min-h-screen items-center justify-center bg-black">
+            <div className="">
+                <Navbar />
+            </div>
+            <div className="flex flex-col items-center bg-slate-800 px-10 py-10">
+                <div className="flex flex-col items-center text-5xl text-white font-[Sprintura Demo] mb-10">
+                        Choose a side
+                </div>
+                <div className="flex flex-row justify-center">
+                    <div className="flex flex-col items-center m-3">
+                        {redDrafter && (
+                            <RedBlueButton text="Red " colour="bg-slate-500 " function={handleRedClick} />
+                            )}
+                        {!redDrafter && (
+                            <RedBlueButton text="Red " colour="bg-red-500 " function={handleRedClick} />
+                        )}
+                    </div>
+                    <div className="flex flex-col items-center m-3">
+                        {blueDrafter && (
+                            <RedBlueButton text="Blue " colour="bg-slate-500 " function={handleBlueClick} />
+                        )}
+                        {!blueDrafter && (
+                            <RedBlueButton text="Blue " colour="bg-blue-500 " function={handleBlueClick} />
+                        )}
+                    </div>
+                </div>
+                <div className="flex flex-row justify-center m-3">
+                    <SpectatorButton function={handleSpecClick} />
+                </div>
+            </div>
+        </div>
     );
 
 }
