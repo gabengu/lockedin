@@ -99,31 +99,35 @@ export default function Select({ roomId, onClick }: selectRoleType) {
         onClick();
     };
 
+    const handleTakenClick = () => {
+        alert("Selected drafter already taken");
+    }
+
     return (
         // has conditional rendering to grey out buttons if drafter already taken
         <div className="flex flex-col min-h-screen items-center justify-center bg-black">
             <div className="">
                 <Navbar />
             </div>
-            <div className="flex flex-col items-center bg-slate-800 px-10 py-10">
+            <div className="flex flex-col items-center bg-slate-800 px-10 py-10 rounded">
                 <div className="flex flex-col items-center text-5xl text-white font-[Sprintura Demo] mb-10">
                         Choose a side
                 </div>
                 <div className="flex flex-row justify-center">
                     <div className="flex flex-col items-center m-3">
                         {redDrafter && (
-                            <RedBlueButton text="Red " colour="bg-slate-500 " function={handleRedClick} />
+                            <RedBlueButton text="Red Taken" colour="bg-slate-500 " hover=" " cursor="cursor-default " function={handleTakenClick} />
                             )}
                         {!redDrafter && (
-                            <RedBlueButton text="Red " colour="bg-red-500 " function={handleRedClick} />
+                            <RedBlueButton text="Red" colour="bg-red-500 " hover="hover:bg-red-400 " cursor="cursor-pointer " function={handleRedClick} />
                         )}
                     </div>
                     <div className="flex flex-col items-center m-3">
                         {blueDrafter && (
-                            <RedBlueButton text="Blue " colour="bg-slate-500 " function={handleBlueClick} />
+                            <RedBlueButton text="Blue Taken" colour="bg-slate-500 " hover=" " cursor="cursor-default " function={handleTakenClick} />
                         )}
                         {!blueDrafter && (
-                            <RedBlueButton text="Blue " colour="bg-blue-500 " function={handleBlueClick} />
+                            <RedBlueButton text="Blue" colour="bg-blue-500 " hover="hover:bg-blue-400 " cursor="cursor-pointer " function={handleBlueClick} />
                         )}
                     </div>
                 </div>
