@@ -105,11 +105,11 @@ export default function Select({ roomId, onClick }: selectRoleType) {
 
     return (
         // has conditional rendering to grey out buttons if drafter already taken
-        <div className="flex flex-col min-h-screen items-center justify-center bg-black">
+        <div className="flex flex-col min-h-screen items-center justify-center bg-radial from-green-500 from-1% to-black to-50%">
             <div className="">
                 <Navbar />
             </div>
-            <div className="flex flex-col items-center bg-slate-800 px-18 py-8 rounded border border-green-500">
+            <div className="flex flex-col items-center bg-slate-900 px-18 py-8 rounded border border-green-500">
                 <div className="flex flex-col items-center text-5xl text-white font-[Sprintura Demo] mb-10">
                         Choose a side
                 </div>
