@@ -109,14 +109,14 @@ export default function Select({ roomId, onClick }: selectRoleType) {
             <div className="">
                 <Navbar />
             </div>
-            <div className="flex flex-col items-center bg-slate-800 px-10 py-10 rounded">
+            <div className="flex flex-col items-center bg-slate-800 px-18 py-8 rounded border border-green-500">
                 <div className="flex flex-col items-center text-5xl text-white font-[Sprintura Demo] mb-10">
                         Choose a side
                 </div>
                 <div className="flex flex-row justify-center">
                     <div className="flex flex-col items-center m-3">
                         {redDrafter && (
-                            <RedBlueButton text="Red Taken" colour="bg-slate-500 " hover=" " cursor="cursor-default " function={handleTakenClick} />
+                            <RedBlueButton text="Red" colour="bg-slate-500 " hover=" " cursor="cursor-default " function={handleTakenClick} />
                             )}
                         {!redDrafter && (
                             <RedBlueButton text="Red" colour="bg-red-500 " hover="hover:bg-red-400 " cursor="cursor-pointer " function={handleRedClick} />
@@ -124,7 +124,7 @@ export default function Select({ roomId, onClick }: selectRoleType) {
                     </div>
                     <div className="flex flex-col items-center m-3">
                         {blueDrafter && (
-                            <RedBlueButton text="Blue Taken" colour="bg-slate-500 " hover=" " cursor="cursor-default " function={handleTakenClick} />
+                            <RedBlueButton text="Blue" colour="bg-slate-500 " hover=" " cursor="cursor-default " function={handleTakenClick} />
                         )}
                         {!blueDrafter && (
                             <RedBlueButton text="Blue" colour="bg-blue-500 " hover="hover:bg-blue-400 " cursor="cursor-pointer " function={handleBlueClick} />
