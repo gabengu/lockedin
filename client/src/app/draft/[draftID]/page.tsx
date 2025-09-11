@@ -104,21 +104,10 @@ export default function DraftRoom({
         // For websocket implementation use
         // if (team == draftOrder[draftState.currentStep].side)
         if (draftState.draftCompletion == false) {
-            const invalidPick: boolean =
-                draftState.globalBans.includes(champion) ||
-                draftState.blueTeamBans.includes(champion) ||
-                draftState.redTeamBans.includes(champion) ||
-                draftState.blueTeamPicks.includes(champion) ||
-                draftState.redTeamPicks.includes(champion);
-
-            if (invalidPick) {
-                throw new Error("Champion is banned or already picked!");
-            } else {
-                setDraftState((prev) => ({
-                    ...prev,
-                    selectedPick: champion,
-                }));
-            }
+            setDraftState((prev) => ({
+                ...prev,
+                selectedPick: champion,
+            }));
         }
     };
 
@@ -248,6 +237,7 @@ export default function DraftRoom({
                                 filterChampions={filterChampions}
                                 activeSide={activeSide}
                                 handleChampionClick={handleChampionClick}
+                                draftState={draftState}
                             />
                         </div>
                         <RedTeamPanel draftState={draftState} />
