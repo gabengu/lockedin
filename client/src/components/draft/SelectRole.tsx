@@ -105,29 +105,34 @@ export default function Select({ roomId, onClick }: selectRoleType) {
 
     return (
         // has conditional rendering to grey out buttons if drafter already taken
-        <div className="flex flex-col min-h-screen items-center justify-center bg-radial from-green-500 from-1% to-black to-50%">
+        <div className="flex flex-col min-h-screen items-center justify-center bg-radial from-green-300 from-1% to-black to-50%">
             <div className="">
                 <Navbar />
             </div>
-            <div className="flex flex-col items-center bg-slate-900 px-18 py-8 rounded border border-green-500">
-                <div className="flex flex-col items-center text-5xl text-white font-[Sprintura Demo] mb-10">
+            <div className="flex flex-col items-center bg-gradientcolor w-115 h-80 rounded-2xl border border-green-300 bg-opacity-80">
+                <div className="flex flex-row w-full h-8">
+                    <div className="flex flex-col justify-start ml-3 mt-3 w-8 h-6 bg-backbutton rounded-sm cursor-pointer">
+                        <div className="flex flex-row justify-center">←</div>
+                    </div>
+                </div>
+                <div className="flex flex-col items-center text-5xl text-sidetext font-[Sprintura Demo] mb-7">
                         Choose a side
                 </div>
                 <div className="flex flex-row justify-center">
-                    <div className="flex flex-col items-center m-3">
-                        {redDrafter && (
-                            <RedBlueButton text="Red" colour="bg-slate-500 " hover=" " cursor="cursor-default " function={handleTakenClick} />
-                            )}
-                        {!redDrafter && (
-                            <RedBlueButton text="Red" colour="bg-red-500 " hover="hover:bg-red-400 " cursor="cursor-pointer " function={handleRedClick} />
-                        )}
-                    </div>
                     <div className="flex flex-col items-center m-3">
                         {blueDrafter && (
                             <RedBlueButton text="Blue" colour="bg-slate-500 " hover=" " cursor="cursor-default " function={handleTakenClick} />
                         )}
                         {!blueDrafter && (
-                            <RedBlueButton text="Blue" colour="bg-blue-500 " hover="hover:bg-blue-400 " cursor="cursor-pointer " function={handleBlueClick} />
+                            <RedBlueButton text="Blue" colour="bg-bluebutton " hover="hover:bg-blue-400 " cursor="cursor-pointer " function={handleBlueClick} />
+                        )}
+                    </div>
+                    <div className="flex flex-col items-center m-3">
+                        {redDrafter && (
+                            <RedBlueButton text="Red" colour="bg-slate-500 " hover=" " cursor="cursor-default " function={handleTakenClick} />
+                            )}
+                        {!redDrafter && (
+                            <RedBlueButton text="Red" colour="bg-redbutton " hover="hover:bg-red-400 " cursor="cursor-pointer " function={handleRedClick} />
                         )}
                     </div>
                 </div>
