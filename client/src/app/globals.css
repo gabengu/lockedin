@@ -43,6 +43,15 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+@theme {
+  --color-specbutton: #4DAB74;
+  --color-bluebutton: #4D74AB;
+  --color-redbutton: #AB4D4D;
+  --color-gradientcolor: #111111CC;
+  --color-sidetext: #F4F4F4;
+  --color-backbutton: #40865D;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
