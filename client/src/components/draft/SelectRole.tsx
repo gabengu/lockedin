@@ -121,7 +121,7 @@ export default function Select({ roomId, onClick }: selectRoleType) {
                 <div className="flex flex-row justify-center">
                     <div className="flex flex-col items-center m-3">
                         {blueDrafter && (
-                            <RedBlueButton text="Blue" colour="bg-slate-500 " hover=" " cursor="cursor-default " function={handleTakenClick} />
+                            <RedBlueButton text="Blue" colour="bg-slate-700 " hover=" " cursor="cursor-default " function={handleTakenClick} />
                         )}
                         {!blueDrafter && (
                             <RedBlueButton text="Blue" colour="bg-bluebutton " hover="hover:bg-blue-400 " cursor="cursor-pointer " function={handleBlueClick} />
@@ -129,7 +129,7 @@ export default function Select({ roomId, onClick }: selectRoleType) {
                     </div>
                     <div className="flex flex-col items-center m-3">
                         {redDrafter && (
-                            <RedBlueButton text="Red" colour="bg-slate-500 " hover=" " cursor="cursor-default " function={handleTakenClick} />
+                            <RedBlueButton text="Red" colour="bg-slate-700 " hover=" " cursor="cursor-default " function={handleTakenClick} />
                             )}
                         {!redDrafter && (
                             <RedBlueButton text="Red" colour="bg-redbutton " hover="hover:bg-red-400 " cursor="cursor-pointer " function={handleRedClick} />
