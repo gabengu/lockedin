@@ -1,6 +1,9 @@
 import type { Socket } from "socket.io";
+import type { DraftChamps } from "./types/types"; // <-- import shared type
+import { Server } from "socket.io";
+import { DraftManager } from "./draftManager";
 
-const io = require("socket.io")(3001, {
+const io = new Server(3001, {
     cors: {
         origin: ["http://localhost:3000"],
     },
@@ -14,61 +17,75 @@ const roomBlueDrafters: { [key: string]: string } = {};
 // stores list of all open rooms
 const roomInfo: string[] = [];
 
+const draftManager = new DraftManager();
+
 io.on("connection", (socket: Socket) => {
-    // recieves a callback function from the client
-    // basically client waits for a response and then re-renders the page once it recieves drafter info
+    console.log(`Client connected: ${socket.id}`);
+
     socket.on("join-room", (data, callback) => {
-        socket.join(data.room);
-        // add room info to list of rooms if it does not exist
-        if (!roomInfo[data.room]) {
-            roomInfo.push(data.room);
+        const { room } = data;
+        socket.join(room);
+
+        // Add room to room list if it doesn't exist
+        if (!roomInfo.includes(room)) {
+            roomInfo.push(room);
         }
-        // client waits for this info
+
+        // Ensure this room has a draft state initialized
+        const currentDraft = draftManager.getDraft(room);
+
+        // Send drafter info + current state back to client
         callback({
-            redDrafter: roomRedDrafters[data.room]
-                ? roomRedDrafters[data.room]
-                : "",
-            blueDrafter: roomBlueDrafters[data.room]
-                ? roomBlueDrafters[data.room]
-                : "",
+            redDrafter: roomRedDrafters[room] ?? "",
+            blueDrafter: roomBlueDrafters[room] ?? "",
+            draftState: currentDraft,
         });
+
+        // Send state to this socket
+        socket.emit("draftState", currentDraft);
     });
 
-    // recieves "send red" from client
     socket.on("send_red", (data) => {
-        // checks if theres a red drafter
-        if (roomRedDrafters[data.room] == undefined) {
-            // if not set requesting client as red drafter
-            roomRedDrafters[data.room] = data.myID;
-            io.to(data.myID).emit("recieve_message", { message: "red take" });
-            // tell the rest red was taken
-            socket
-                .to(data.room)
-                .emit("recieve_message", { message: "i took red" });
+        const { room, myID } = data;
+        if (!roomRedDrafters[room]) {
+            roomRedDrafters[room] = myID;
+            io.to(myID).emit("recieve_message", { message: "red take" });
+            socket.to(room).emit("recieve_message", { message: "i took red" });
         } else {
-            // else notify the user they cannot take red
-            io.to(data.myID).emit("recieve_message", {
+            io.to(myID).emit("recieve_message", {
                 message: "Red already taken",
             });
         }
     });
-    // same as red
+
     socket.on("send_blue", (data) => {
-        if (roomBlueDrafters[data.room] == undefined) {
-            roomBlueDrafters[data.room] = data.myID;
-            io.to(data.myID).emit("recieve_message", { message: "blue take" });
-            // tell the rest blue was taken
-            socket
-                .to(data.room)
-                .emit("recieve_message", { message: "i took blue" });
+        const { room, myID } = data;
+        if (!roomBlueDrafters[room]) {
+            roomBlueDrafters[room] = myID;
+            io.to(myID).emit("recieve_message", { message: "blue take" });
+            socket.to(room).emit("recieve_message", { message: "i took blue" });
         } else {
-            io.to(data.myID).emit("recieve_message", {
+            io.to(myID).emit("recieve_message", {
                 message: "Blue already taken",
             });
         }
     });
-    // no special cases for spectator yet
+
     socket.on("send_spec", (data) => {
         io.to(data.myID).emit("recieve_message", data);
+    });
+
+    socket.on("updateDraft", (room: string, newState: DraftChamps) => {
+        const updated = draftManager.updateDraft(room, newState);
+        io.to(room).emit("draftState", updated);
+    });
+
+    socket.on("getDraftState", (room: string) => {
+        const current = draftManager.getDraft(room);
+        socket.emit("draftState", current);
+    });
+
+    socket.on("disconnect", () => {
+        console.log(`Client disconnected: ${socket.id}`);
     });
 });
