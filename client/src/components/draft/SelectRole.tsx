@@ -29,6 +29,7 @@ type drafters = {
 export default function Select({ roomId, onClick }: selectRoleType) {
     const [redDrafter, setRedDrafter] = useState<boolean>(false);
     const [blueDrafter, setBlueDrafter] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const socketRef = useRef<Socket>(null);
     useEffect(() => {
         socketRef.current = io("http://localhost:3001");
@@ -43,6 +44,7 @@ export default function Select({ roomId, onClick }: selectRoleType) {
         }, (response:drafters) => {
             setRedDrafter(response.redDrafter === "" ? false : true);
             setBlueDrafter(response.blueDrafter === "" ? false : true);
+            setLoading(false);
         });
 
         // this is the general function for all message recieving from server
@@ -105,40 +107,44 @@ export default function Select({ roomId, onClick }: selectRoleType) {
 
     return (
         // has conditional rendering to grey out buttons if drafter already taken
-        <div className="flex flex-col min-h-screen items-center justify-center bg-radial from-green-300 from-1% to-black to-25%">
-            <Navbar />
-            <div className="flex flex-col items-center w-115 h-80 rounded-2xl border border-green-300 bg-opacity-80 bg-gradientcolor shadow-[0_0_80px_30px_rgba(74,222,128,0.5)]">
-                <div className="flex flex-row w-full h-8">
-                    <div className="flex flex-col justify-start ml-3 mt-3 w-8 h-6 bg-backbutton rounded-sm cursor-pointer hover:bg-green-500">
-                        <div className="flex flex-row justify-center">←</div>
-                    </div>
-                </div>
-                <div className="flex flex-col items-center text-5xl text-sidetext font-[Sprintura Demo] mb-7">
-                        Choose a side
-                </div>
-                <div className="flex flex-row justify-center">
-                    <div className="flex flex-col items-center m-3">
-                        {blueDrafter && (
-                            <RedBlueButton text="Blue" colour="bg-slate-700 " hover=" " cursor="cursor-default " function={handleTakenClick} />
-                        )}
-                        {!blueDrafter && (
-                            <RedBlueButton text="Blue" colour="bg-bluebutton " hover="hover:bg-blue-400 " cursor="cursor-pointer " function={handleBlueClick} />
-                        )}
-                    </div>
-                    <div className="flex flex-col items-center m-3">
-                        {redDrafter && (
-                            <RedBlueButton text="Red" colour="bg-slate-700 " hover=" " cursor="cursor-default " function={handleTakenClick} />
-                            )}
-                        {!redDrafter && (
-                            <RedBlueButton text="Red" colour="bg-redbutton " hover="hover:bg-red-400 " cursor="cursor-pointer " function={handleRedClick} />
-                        )}
-                    </div>
-                </div>
-                <div className="flex flex-row justify-center m-3">
-                    <SpectatorButton function={handleSpecClick} />
+            <div className="flex flex-col min-h-screen items-center justify-center bg-radial from-green-300 from-1% to-black to-25%">
+                <Navbar />
+                <div className="flex flex-col items-center w-115 h-80 rounded-2xl border border-green-300 bg-opacity-80 bg-gradientcolor shadow-[0_0_80px_30px_rgba(74,222,128,0.5)]">
+                    {!loading && (
+                        <>
+                            <div className="flex flex-row w-full h-8">
+                                <div className="flex flex-col justify-start ml-3 mt-3 w-8 h-6 bg-backbutton rounded-sm cursor-pointer hover:bg-green-500">
+                                    <div className="flex flex-row justify-center">←</div>
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-center text-5xl text-sidetext font-[Sprintura Demo] mb-7">
+                                    Choose a side
+                            </div>
+                            <div className="flex flex-row justify-center">
+                                <div className="flex flex-col items-center m-3">
+                                    {blueDrafter && (
+                                        <RedBlueButton text="Blue" colour="bg-slate-700 " hover=" " cursor="cursor-default " function={handleTakenClick} />
+                                    )}
+                                    {!blueDrafter && (
+                                        <RedBlueButton text="Blue" colour="bg-bluebutton " hover="hover:bg-blue-400 " cursor="cursor-pointer " function={handleBlueClick} />
+                                    )}
+                                </div>
+                                <div className="flex flex-col items-center m-3">
+                                    {redDrafter && (
+                                        <RedBlueButton text="Red" colour="bg-slate-700 " hover=" " cursor="cursor-default " function={handleTakenClick} />
+                                        )}
+                                    {!redDrafter && (
+                                        <RedBlueButton text="Red" colour="bg-redbutton " hover="hover:bg-red-400 " cursor="cursor-pointer " function={handleRedClick} />
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex flex-row justify-center m-3">
+                                <SpectatorButton function={handleSpecClick} />
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
-        </div>
     );
 
 }
