@@ -106,9 +106,8 @@ export default function Select({ roomId, onClick }: selectRoleType) {
     return (
         // has conditional rendering to grey out buttons if drafter already taken
         <div className="flex flex-col min-h-screen items-center justify-center bg-radial from-green-300 from-1% to-black to-50%">
-            <div className="">
-                <Navbar />
-            </div>
+            <Navbar />
+            
             <div className="flex flex-col items-center bg-gradientcolor w-115 h-80 rounded-2xl border border-green-300 bg-opacity-80">
                 <div className="flex flex-row w-full h-8">
                     <div className="flex flex-col justify-start ml-3 mt-3 w-8 h-6 bg-backbutton rounded-sm cursor-pointer">
