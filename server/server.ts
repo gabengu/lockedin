@@ -34,11 +34,10 @@ io.on("connection", (socket: Socket) => {
         // Ensure this room has a draft state initialized
         const currentDraft = draftManager.getDraft(room);
 
-        // Send drafter info + current state back to client
+        // Send drafter info to client
         callback({
             redDrafter: roomRedDrafters[room] ?? "",
             blueDrafter: roomBlueDrafters[room] ?? "",
-            draftState: currentDraft,
         });
 
         // Send state to this socket
