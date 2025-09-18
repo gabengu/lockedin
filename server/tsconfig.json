@@ -6,13 +6,15 @@
     // "outDir": "./dist",
 
     // Environment Settings
-    // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
-    // For nodejs:
-    "lib": ["esnext"],
+  "module": "ES2020",
+  "allowImportingTsExtensions": true,
+  "noEmit": true,
+    "moduleResolution": "node",
+    "target": "ES2020",
+    "lib": ["ES2020"],
     "types": ["node"],
-    // and npm install -D @types/node
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
 
     // Other Outputs
     "sourceMap": true,

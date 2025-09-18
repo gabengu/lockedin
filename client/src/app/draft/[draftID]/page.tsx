@@ -1,5 +1,5 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { act, use, useEffect, useRef, useState } from "react";
 import TeamHeader from "@/components/draft/TeamHeader";
 import BlueTeamPanel from "@/components/draft/BlueTeamPanel";
 import RedTeamPanel from "@/components/draft/RedTeamPanel";
@@ -13,6 +13,7 @@ import { draftOrder, DraftChamps } from "./draftOrder.tsx";
 import { notFound, useRouter } from "next/navigation";
 import { getDraft } from "../roomStore.ts";
 import { set } from "better-auth";
+import io, { Socket } from "socket.io-client";
 
 type DraftData = {
     team1: string;
@@ -24,6 +25,12 @@ type PageProps = {
     draftID: string;
 };
 
+export enum Role {
+    RED = "red",
+    BLUE = "blue",
+    SPECTATOR = "spectator",
+}
+
 export default function DraftRoom({
     params,
 }: {
@@ -33,7 +40,7 @@ export default function DraftRoom({
     const [draftData, setDraftData] = useState<DraftData>();
 
     const [roomId, setRoomId] = useState<string>("");
-    const [hasRole, setHasRole] = useState<boolean>(false);
+    const [role, setRole] = useState<Role | null>(null);
 
     const [allChampions, setAllChampions] = useState<string[]>([]);
     const [filterChampions, setFilterChampions] = useState<string[]>([]);
@@ -49,7 +56,7 @@ export default function DraftRoom({
         draftCompletion: true,
         selectedPick: null,
     });
-
+    const socketRef = useRef<Socket | null>(null);
     useEffect(() => {
         async function getData() {
             const draftID = (await params).draftID;
@@ -74,6 +81,19 @@ export default function DraftRoom({
         }
         getAllChampions();
         getData();
+
+        socketRef.current = io("http://localhost:3001");
+        socketRef.current?.on("draftState", (data: DraftChamps) => {
+            setDraftState(data);
+            if (!data.draftCompletion) {
+                setActiveSide(draftOrder[data.draftStep].side);
+            }
+            console.log(data);
+        });
+        return () => {
+            socketRef.current?.off("recieve_message");
+            socketRef.current?.disconnect();
+        };
     }, []);
 
     const renderIcons = () => {
@@ -101,72 +121,65 @@ export default function DraftRoom({
     }
 
     const handleChampionClick = (champion: string, team: "blue" | "red") => {
-        // For websocket implementation use
-        // if (team == draftOrder[draftState.currentStep].side)
-        if (draftState.draftCompletion == false) {
-            setDraftState((prev) => ({
-                ...prev,
-                selectedPick: champion,
-            }));
+        if (team == role && draftState.draftCompletion == false) {
+            {
+                setDraftState((prev) => ({
+                    ...prev,
+                    selectedPick: champion,
+                }));
+                socketRef.current?.emit("updateDraft", roomId, {
+                    ...draftState,
+                    selectedPick: champion,
+                });
+            }
         }
     };
-
     const handleLockIn = () => {
-        const step = draftOrder[draftState.draftStep];
+        setDraftState((prev) => {
+            const step = draftOrder[prev.draftStep];
+            const newState = { ...prev };
 
-        if (draftState.selectedPick)
-            if (step.action == "ban") {
-                if (step.side == "blue") {
-                    setDraftState((prev) => ({
-                        ...prev,
-                        blueTeamBans: addChampion(
+            if (prev.selectedPick) {
+                if (step.action === "ban") {
+                    if (step.side === "blue") {
+                        newState.blueTeamBans = addChampion(
                             prev.blueTeamBans,
-                            draftState.selectedPick,
-                        ),
-                    }));
-                }
-                if (step.side == "red") {
-                    setDraftState((prev) => ({
-                        ...prev,
-                        redTeamBans: addChampion(
+                            prev.selectedPick,
+                        );
+                    } else if (step.side === "red") {
+                        newState.redTeamBans = addChampion(
                             prev.redTeamBans,
-                            draftState.selectedPick,
-                        ),
-                    }));
-                }
-            } else if (step.action == "pick") {
-                if (step.side == "blue") {
-                    setDraftState((prev) => ({
-                        ...prev,
-                        blueTeamPicks: addChampion(
+                            prev.selectedPick,
+                        );
+                    }
+                } else if (step.action === "pick") {
+                    if (step.side === "blue") {
+                        newState.blueTeamPicks = addChampion(
                             prev.blueTeamPicks,
-                            draftState.selectedPick,
-                        ),
-                    }));
-                }
-                if (step.side == "red") {
-                    setDraftState((prev) => ({
-                        ...prev,
-                        redTeamPicks: addChampion(
+                            prev.selectedPick,
+                        );
+                    } else if (step.side === "red") {
+                        newState.redTeamPicks = addChampion(
                             prev.redTeamPicks,
-                            draftState.selectedPick,
-                        ),
-                    }));
+                            prev.selectedPick,
+                        );
+                    }
                 }
             }
-        setDraftState((prev) => ({
-            ...prev,
-            draftStep: prev.draftStep + 1,
-            selectedPick: null,
-        }));
-        setActiveSide(step.side);
 
-        if (draftState.draftStep == 19) {
-            setDraftState((prev) => ({
-                ...prev,
-                draftCompletion: true,
-            }));
-        }
+            newState.draftStep = prev.draftStep + 1;
+            newState.selectedPick = null;
+            if (prev.draftStep === 19) {
+                newState.draftCompletion = true;
+            }
+
+            if (!newState.draftCompletion) {
+                setActiveSide(draftOrder[newState.draftStep].side);
+            }
+            socketRef.current?.emit("updateDraft", roomId, newState);
+
+            return newState;
+        });
     };
 
     //Currently doubles as draft initiation.
@@ -201,13 +214,17 @@ export default function DraftRoom({
             draftCompletion: false,
         }));
     };
-
+    console.log(role);
     return (
         <>
-            {!hasRole && (
-                <SelectRole roomId={roomId} onClick={() => setHasRole(true)} />
+            {!role && (
+                <SelectRole
+                    roomId={roomId}
+                    onClick={(value: Role) => setRole(value)}
+                    socketRef={socketRef}
+                />
             )}
-            {draftData && hasRole && (
+            {draftData && role && (
                 <div className="flex flex-col bg-black min-h-screen">
                     <TeamHeader
                         team1={draftData.team1}
@@ -243,7 +260,7 @@ export default function DraftRoom({
                         <RedTeamPanel draftState={draftState} />
                     </div>
                     <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-                        {draftState.selectedPick && (
+                        {draftState.selectedPick && role === activeSide && (
                             <LockInButton onClick={handleLockIn} />
                         )}
                         {draftState.draftCompletion && (
