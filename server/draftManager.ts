@@ -7,11 +7,11 @@ const DEFAULT_DRAFT: DraftChamps = {
     blueTeamPicks: new Array(5).fill(null),
     redTeamPicks: new Array(5).fill(null),
     draftStep: 0,
-    draftCompletion: false,
+    draftCompletion: true,
     selectedPick: null,
 };
 
-export class DraftManager {
+class DraftManager {
     private drafts: Map<string, DraftChamps> = new Map();
 
     createDraft(roomId: string): DraftChamps {
@@ -29,3 +29,5 @@ export class DraftManager {
         return newState;
     }
 }
+
+export { DraftManager };

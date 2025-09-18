@@ -1,11 +1,11 @@
 "use client";
 
-import io from "socket.io-client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import RedBlueButton from "./RedBlueButton";
 import SpectatorButton from "./SpectatorButton";
 import Navbar from "../navbar";
+import { Role } from "@/app/draft/[draftID]/page";
 
 type teamInfo = {
     redDrafter: boolean;
@@ -17,7 +17,8 @@ type teamInfo = {
 
 type selectRoleType = {
     roomId: string;
-    onClick: () => void;
+    onClick: (value: Role) => void;
+    socketRef: React.RefObject<Socket | null>;
 };
 
 type joinResponse = {
@@ -25,16 +26,14 @@ type joinResponse = {
     blueDrafter: string;
 };
 
-export default function Select({ roomId, onClick }: selectRoleType) {
+export default function Select({ roomId, onClick, socketRef }: selectRoleType) {
     const [redDrafter, setRedDrafter] = useState<boolean>(false);
     const [blueDrafter, setBlueDrafter] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
-    const socketRef = useRef<Socket>(null);
     useEffect(() => {
-        socketRef.current = io("http://localhost:3001");
-
         // first thing a client does when opening page
-        socketRef.current.emit(
+        console.log(socketRef.current);
+        socketRef.current?.emit(
             "join-room",
             {
                 message: "ROOM JOINED",
@@ -46,17 +45,18 @@ export default function Select({ roomId, onClick }: selectRoleType) {
             (response: joinResponse) => {
                 setRedDrafter(response.redDrafter === "" ? false : true);
                 setBlueDrafter(response.blueDrafter === "" ? false : true);
+                setLoading(false);
             },
         );
 
         // this is the general function for all message recieving from server
-        socketRef.current.on("recieve_message", (data) => {
+        socketRef.current?.on("recieve_message", (data) => {
             // server has allowed this client to take red
             if (data.message == "red take") {
                 // render draft page
-                onClick();
+                onClick(Role.RED);
             } else if (data.message == "blue take") {
-                onClick();
+                onClick(Role.BLUE);
             }
             // red has already been taken. they get an alert and the button should have been grey anyways
             else if (data.message == "Red already taken") {
@@ -69,10 +69,6 @@ export default function Select({ roomId, onClick }: selectRoleType) {
                 setBlueDrafter(true);
             }
         });
-        return () => {
-            socketRef.current?.off("recieve_message");
-            socketRef.current?.disconnect();
-        };
     }, [roomId, redDrafter, blueDrafter]);
 
     // red was clicked
@@ -95,7 +91,7 @@ export default function Select({ roomId, onClick }: selectRoleType) {
             message: "SPEC CLICKED",
             room: roomId,
         });
-        onClick();
+        onClick(Role.SPECTATOR);
     };
 
     const handleTakenClick = () => {

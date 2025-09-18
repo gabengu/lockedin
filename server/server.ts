@@ -1,7 +1,7 @@
 import type { Socket } from "socket.io";
 import type { DraftChamps } from "./types/types"; // <-- import shared type
 import { Server } from "socket.io";
-import { DraftManager } from "./draftManager";
+import { DraftManager } from "./draftManager.ts";
 
 const io = new Server(3001, {
     cors: {
