@@ -13,7 +13,7 @@ export default function SplashArt(props: SplashArtProps) {
         fill
         src={
           "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/" +
-          props.name +
+          (props.name === "Wukong" ? "MonkeyKing" : props.name) +
           "_0.jpg"
         }
       />
