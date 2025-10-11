@@ -26,7 +26,7 @@ const ChampionGrid: React.FC<ChampionGridProps> = ({
     };
 
     return (
-        <div className="flex flex-wrap overflow-y-auto w-[800px] h-[calc(100vh-180px)] items-center justify-center hide-scrollbar">
+        <div className="flex flex-wrap overflow-y-auto w-[800px] h-[calc(100vh-180px)] items-center justify-center content-start hide-scrollbar">
             {filterChampions.map((name, index) => {
                 const isDisabled = isChampionDisabled(name);
                 return (

@@ -22,23 +22,23 @@ export default function Draft() {
         team2: string;
         draftType: Draft;
     };
-  
-  let data: DraftData;
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    data = {
-      team1: formData.get("team1") as string,
-      team2: formData.get("team2") as string,
-      draftType: formData.get("draftType") as Draft,
-    };
-    //console.log("creating draft with:", data)
-    const id = await handleSaveDraft(data)
-    setDraftLink(id)
-    console.log("id: " + id)
-    //console.log("generated link: " + draftLink)
-  }
+    let data: DraftData;
+
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        data = {
+            team1: formData.get("team1") as string,
+            team2: formData.get("team2") as string,
+            draftType: formData.get("draftType") as Draft,
+        };
+        //console.log("creating draft with:", data)
+        const id = await handleSaveDraft(data);
+        setDraftLink(id);
+        console.log("id: " + id);
+        //console.log("generated link: " + draftLink)
+    }
 
     return (
         <section className="max-w-xl mx-auto p-6 bg-gray-900 text-white rounded-xl shadow-lg">
@@ -129,7 +129,7 @@ export default function Draft() {
                         className="px-4 py-2 bg-gray-700 text-white rounded"
                     >
                         Copy Draft Link
-                    </button>  
+                    </button>
                     <button
                         onClick={() => router.push("/draft/" + draftLink)}
                         className="px-4 py-2 bg-blue-600 text-white rounded"
