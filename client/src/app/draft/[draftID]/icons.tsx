@@ -15,7 +15,7 @@ export default function Icons(props: IconsProps) {
         width={props.width}
         src={
           "https://ddragon.leagueoflegends.com/cdn/15.15.1/img/champion/" +
-          props.name +
+          (props.name === "Wukong" ? "MonkeyKing" : props.name) +
           ".png"
         }
       />

@@ -1,5 +1,10 @@
 "use client";
 import { act, use, useEffect, useRef, useState } from "react";
+import topIcon from "@/assets/role-icons/topIcon.svg";
+import jungleIcon from "@/assets/role-icons/jungleIcon.svg";
+import midIcon from "@/assets/role-icons/midIcon.svg";
+import adIcon from "@/assets/role-icons/adIcon.svg";
+import supportIcon from "@/assets/role-icons/supportIcon.svg";
 import TeamHeader from "@/components/draft/TeamHeader";
 import BlueTeamPanel from "@/components/draft/BlueTeamPanel";
 import RedTeamPanel from "@/components/draft/RedTeamPanel";
@@ -7,13 +12,13 @@ import ChampionGrid from "@/components/draft/ChampionGrid";
 import LockInButton from "@/components/draft/LockInButton";
 import ReadyForGameButton from "@/components/draft/ReadyForGameButton";
 import SelectRole from "@/components/draft/SelectRole";
-import Icons from "./icons.tsx";
-import SplashArt from "./splashArt.tsx";
 import { draftOrder, DraftChamps } from "./draftOrder.tsx";
-import { notFound, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { getDraft } from "../roomStore.ts";
 import { set } from "better-auth";
 import io, { Socket } from "socket.io-client";
+import champRoles from "@/assets/champion_roles.json";
+import Image from "next/image";
 
 type DraftData = {
     team1: string;
@@ -31,6 +36,15 @@ export enum Role {
     SPECTATOR = "spectator",
 }
 
+export enum ChampionRole {
+    top = "top",
+    jungle = "jungle",
+    mid = "mid",
+    ad = "ad",
+    support = "support",
+    none = "none",
+}
+
 export default function DraftRoom({
     params,
 }: {
@@ -44,7 +58,11 @@ export default function DraftRoom({
 
     const [allChampions, setAllChampions] = useState<string[]>([]);
     const [filterChampions, setFilterChampions] = useState<string[]>([]);
+    const [searchChampion, setSearchChampion] = useState<string>("");
     const [activeSide, setActiveSide] = useState<"blue" | "red">("blue");
+    const [roleSelected, setRoleSelected] = useState<ChampionRole>(
+        ChampionRole.none,
+    );
 
     const [draftState, setDraftState] = useState<DraftChamps>({
         globalBans: [],
@@ -96,10 +114,27 @@ export default function DraftRoom({
         };
     }, []);
 
-    const renderIcons = () => {
-        // Deprecated: replaced by ChampionGrid
-        return null;
-    };
+    useEffect(() => {
+        let roleFiltered: string[] = allChampions;
+        if (roleSelected !== ChampionRole.none) {
+            if (roleSelected === ChampionRole.top)
+                roleFiltered = champRoles.all.top;
+            if (roleSelected === ChampionRole.jungle)
+                roleFiltered = champRoles.all.jungle;
+            if (roleSelected === ChampionRole.mid)
+                roleFiltered = champRoles.all.mid;
+            if (roleSelected === ChampionRole.ad)
+                roleFiltered = champRoles.all.adc;
+            if (roleSelected === ChampionRole.support)
+                roleFiltered = champRoles.all.support;
+        }
+
+        const finalFiltered = roleFiltered.filter((champion) =>
+            champion.toLowerCase().includes(searchChampion.toLowerCase()),
+        );
+
+        setFilterChampions(finalFiltered);
+    }, [searchChampion, roleSelected, allChampions]);
 
     function addChampion(
         array: (string | null)[],
@@ -119,6 +154,10 @@ export default function DraftRoom({
         }
         return array;
     }
+
+    const handleRoleClick = (role: ChampionRole) => {
+        setRoleSelected((prev) => (prev === role ? ChampionRole.none : role));
+    };
 
     const handleChampionClick = (champion: string, team: "blue" | "red") => {
         if (team == role && draftState.draftCompletion == false) {
@@ -233,22 +272,92 @@ export default function DraftRoom({
                     <div className="flex flex-row justify-between">
                         <BlueTeamPanel draftState={draftState} />
                         <div className="flex flex-col items-center">
-                            <div className=" flex flex-row justify-between w-[731px]">
-                                <div className=" flex flex-row w-[250px] justify-between items-center">
-                                    <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
-                                    <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
-                                    <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
-                                    <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
-                                    <div className="bg-[#40865d] w-[40px] h-[40px]"></div>
+                            <div className=" flex flex-row justify-between w-[731px] pt-1">
+                                <div className=" flex flex-row w-[250px] justify-between items-center ">
+                                    <div
+                                        className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px] rounded-md"
+                                        onClick={() =>
+                                            handleRoleClick(ChampionRole.top)
+                                        }
+                                    >
+                                        <Image
+                                            src={topIcon}
+                                            alt="Top Icon"
+                                            className={`m-auto rounded-md ${roleSelected === ChampionRole.top ? " shadow-[0_0_8px_2px_rgba(255,255,255,0.8)]" : ""}`}
+                                            width={40}
+                                            height={40}
+                                        />
+                                    </div>
+                                    <div
+                                        className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px] rounded-md"
+                                        onClick={() =>
+                                            handleRoleClick(ChampionRole.jungle)
+                                        }
+                                    >
+                                        <Image
+                                            src={jungleIcon}
+                                            alt="Jungle Icon"
+                                            className={`m-auto rounded-md ${roleSelected === ChampionRole.jungle ? " shadow-[0_0_8px_2px_rgba(255,255,255,0.8)]" : ""}`}
+                                            width={40}
+                                            height={40}
+                                        />
+                                    </div>
+                                    <div
+                                        className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px] rounded-md"
+                                        onClick={() =>
+                                            handleRoleClick(ChampionRole.mid)
+                                        }
+                                    >
+                                        <Image
+                                            src={midIcon}
+                                            alt="Mid Icon"
+                                            className={`m-auto rounded-md ${roleSelected === ChampionRole.mid ? " shadow-[0_0_8px_2px_rgba(255,255,255,0.8)]" : ""}`}
+                                            width={40}
+                                            height={40}
+                                        />
+                                    </div>
+                                    <div
+                                        className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px] rounded-md"
+                                        onClick={() =>
+                                            handleRoleClick(ChampionRole.ad)
+                                        }
+                                    >
+                                        <Image
+                                            src={adIcon}
+                                            alt="AD Icon"
+                                            className={`m-auto rounded-md ${roleSelected === ChampionRole.ad ? " shadow-[0_0_8px_2px_rgba(255,255,255,0.8)]" : ""}`}
+                                            width={40}
+                                            height={40}
+                                        />
+                                    </div>
+                                    <div
+                                        className="bg-[#40865d] flex flex-col align-middle w-[40px] h-[40px] rounded-md"
+                                        onClick={() =>
+                                            handleRoleClick(
+                                                ChampionRole.support,
+                                            )
+                                        }
+                                    >
+                                        <Image
+                                            src={supportIcon}
+                                            alt="Support Icon"
+                                            className={`m-auto rounded-md ${roleSelected === ChampionRole.support ? " shadow-[0_0_8px_2px_rgba(255,255,255,0.8)]" : ""}`}
+                                            width={40}
+                                            height={40}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="inline-block border-2 border-[#40865d]">
-                                    <input
-                                        className=""
-                                        type="text"
-                                        id="myTextInput"
-                                        name="myTextInput"
-                                    />
-                                </div>
+                                <input
+                                    className="border-1 border-[#40865d] rounded-md focus:border-[#40865d] focus:border-2 focus:outline-none text-white placeholder:pl-[4px] pl-[10]"
+                                    type="text"
+                                    id="championSearchInput"
+                                    name="championSearchInput"
+                                    placeholder="search by name"
+                                    value={searchChampion}
+                                    onChange={(e) =>
+                                        setSearchChampion(e.target.value)
+                                    }
+                                />
                             </div>
                             <ChampionGrid
                                 filterChampions={filterChampions}
