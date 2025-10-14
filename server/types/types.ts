@@ -6,5 +6,7 @@ export interface DraftChamps {
     redTeamPicks: (number | null)[];
     draftStep: number; // e.g. turn count
     draftCompletion: boolean;
+    readyBlue: boolean;
+    readyRed: boolean;
     selectedPick: number | null;
 }
