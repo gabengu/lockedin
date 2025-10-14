@@ -8,6 +8,8 @@ const DEFAULT_DRAFT: DraftChamps = {
     redTeamPicks: new Array(5).fill(null),
     draftStep: 0,
     draftCompletion: true,
+    readyBlue: false,
+    readyRed: false,
     selectedPick: null,
 };
 
