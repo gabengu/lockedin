@@ -72,6 +72,8 @@ export default function DraftRoom({
         redTeamPicks: new Array(5).fill(null),
         draftStep: 20,
         draftCompletion: true,
+        readyBlue: false,
+        readyRed: false,
         selectedPick: null,
     });
     const socketRef = useRef<Socket | null>(null);
@@ -223,37 +225,48 @@ export default function DraftRoom({
 
     //Currently doubles as draft initiation.
     const restartDraft = () => {
-        if (draftData?.draftType == "fearless" || "ironman") {
-            setDraftState((prev) => ({
-                ...prev,
-                globalBans: [
-                    ...prev.globalBans,
-                    ...draftState.blueTeamPicks,
-                    ...draftState.redTeamPicks,
-                ],
-            }));
-            if (draftData?.draftType == "ironman") {
-                setDraftState((prev) => ({
-                    ...prev,
-                    globalBans: [
-                        ...prev.globalBans,
-                        ...draftState.blueTeamBans,
-                        ...draftState.redTeamBans,
-                    ],
-                }));
-            }
+        const newState = { ...draftState };
+        if (role == "blue") {
+            newState.readyBlue = !draftState.readyBlue;
+            socketRef.current?.emit("updateDraft", roomId, newState);
+        } else if (role == "red") {
+            newState.readyRed = !draftState.readyRed;
+            socketRef.current?.emit("updateDraft", roomId, newState);
         }
-        setDraftState((prev) => ({
-            ...prev,
-            blueTeamBans: setNull(prev.blueTeamBans),
-            redTeamBans: setNull(prev.redTeamBans),
-            blueTeamPicks: setNull(prev.blueTeamPicks),
-            redTeamPicks: setNull(prev.redTeamPicks),
-            draftStep: 0,
-            draftCompletion: false,
-        }));
+
+        if (newState.readyBlue && newState.readyRed) {
+            if (draftData?.draftType == "fearless") {
+                newState.globalBans = [
+                    ...newState.globalBans,
+                    ...newState.blueTeamPicks,
+                    ...newState.redTeamPicks,
+                ];
+            }
+            if (draftData?.draftType == "ironman") {
+                newState.globalBans = [
+                    ...newState.globalBans,
+                    ...newState.blueTeamPicks,
+                    ...newState.redTeamPicks,
+                    ...newState.blueTeamBans,
+                    ...newState.redTeamBans,
+                ];
+            }
+
+            newState.blueTeamBans = setNull(newState.blueTeamBans);
+            newState.redTeamBans = setNull(newState.redTeamBans);
+            newState.blueTeamPicks = setNull(newState.blueTeamPicks);
+            newState.redTeamPicks = setNull(newState.redTeamPicks);
+            newState.draftStep = 0;
+            newState.draftCompletion = false;
+            newState.readyBlue = false;
+            newState.readyRed = false;
+            newState.selectedPick = null;
+            setActiveSide(draftOrder[0].side);
+        }
+        setDraftState(newState);
+        socketRef.current?.emit("updateDraft", roomId, newState);
     };
-    console.log(role);
+
     return (
         <>
             {!role && (
@@ -373,7 +386,12 @@ export default function DraftRoom({
                             <LockInButton onClick={handleLockIn} />
                         )}
                         {draftState.draftCompletion && (
-                            <ReadyForGameButton onClick={restartDraft} />
+                            <ReadyForGameButton
+                                onClick={restartDraft}
+                                blueReady={draftState.readyBlue}
+                                redReady={draftState.readyRed}
+                                role={role}
+                            />
                         )}
                     </div>
                 </div>

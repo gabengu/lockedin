@@ -39,5 +39,7 @@ export type DraftChamps = {
     redTeamPicks: (string | null)[];
     draftStep: number;
     draftCompletion: boolean;
+    readyBlue: boolean;
+    readyRed: boolean;
     selectedPick: string | null;
 };
