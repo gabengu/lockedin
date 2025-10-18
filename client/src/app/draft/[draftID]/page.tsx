@@ -235,20 +235,23 @@ export default function DraftRoom({
         }
 
         if (newState.readyBlue && newState.readyRed) {
-            if (draftData?.draftType == "fearless" || "ironman") {
+            if (draftData?.draftType == "fearless") {
                 newState.globalBans = [
                     ...newState.globalBans,
                     ...newState.blueTeamPicks,
                     ...newState.redTeamPicks,
                 ];
-                if (draftData?.draftType == "ironman") {
-                    newState.globalBans = [
-                        ...newState.globalBans,
-                        ...newState.blueTeamBans,
-                        ...newState.redTeamBans,
-                    ];
-                }
             }
+            if (draftData?.draftType == "ironman") {
+                newState.globalBans = [
+                    ...newState.globalBans,
+                    ...newState.blueTeamPicks,
+                    ...newState.redTeamPicks,
+                    ...newState.blueTeamBans,
+                    ...newState.redTeamBans,
+                ];
+            }
+
             newState.blueTeamBans = setNull(newState.blueTeamBans);
             newState.redTeamBans = setNull(newState.redTeamBans);
             newState.blueTeamPicks = setNull(newState.blueTeamPicks);
