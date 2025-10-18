@@ -14,21 +14,31 @@ import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export function RegisterForm({
+export function ResetPasswordForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
     const router = useRouter();
+    const [isValidToken, setIsValidToken] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        // Check if we have a valid reset token in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get("token");
+        const type = urlParams.get("type");
+
+        if (token && type === "recovery") {
+            setIsValidToken(true);
+        }
+        setIsLoading(false);
+    }, []);
+
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
-
-        const email = formData.get("email") as string;
-        if (!email) return toast.error("Email is required");
-
-        const username = formData.get("username") as string;
-        if (!username) return toast.error("Username is required");
 
         const password = formData.get("password") as string;
         if (!password) return toast.error("Password is required");
@@ -37,24 +47,22 @@ export function RegisterForm({
         if (!confirmPassword)
             return toast.error("Please confirm your password");
 
-        if (password !== confirmPassword)
+        if (password !== confirmPassword) {
             return toast.error("Passwords do not match");
+        }
 
-        await authClient.signUp.email(
+        await authClient.resetPassword(
             {
-                name: "",
-                email: email,
-                password: password,
-                username: username,
+                newPassword: password,
             },
             {
                 onRequest: () => {
-                    toast.loading("Creating your account...");
+                    toast.loading("Updating password...");
                 },
                 onSuccess: () => {
                     toast.dismiss();
-                    toast.success("Account created successfully!");
-                    router.push("/");
+                    toast.success("Password updated successfully!");
+                    router.push("/auth/login");
                 },
                 onError: (ctx) => {
                     toast.dismiss();
@@ -63,37 +71,58 @@ export function RegisterForm({
             },
         );
     }
+
+    if (isLoading) {
+        return (
+            <div className={cn("flex flex-col gap-6", className)} {...props}>
+                <Card>
+                    <CardContent className="pt-6">
+                        <div className="text-center">Loading...</div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+
+    if (!isValidToken) {
+        return (
+            <div className={cn("flex flex-col gap-6", className)} {...props}>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Invalid Reset Link</CardTitle>
+                        <CardDescription>
+                            This password reset link is invalid or has expired.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="mt-4 text-center text-sm">
+                            <Link
+                                href="/auth/forgot-password"
+                                className="underline underline-offset-4"
+                            >
+                                Request a new password reset
+                            </Link>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
                 <CardHeader>
-                    <CardTitle>Sign up for an account</CardTitle>
+                    <CardTitle>Reset your password</CardTitle>
                     <CardDescription>
-                        Enter your details below to create a new account
+                        Enter your new password below
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="flex flex-col gap-6">
                             <div className="grid gap-3">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    placeholder="email@locked.in"
-                                />
-                            </div>
-                            <div className="grid gap-3">
-                                <div className="flex items-center">
-                                    <Label htmlFor="username">Username</Label>
-                                </div>
-                                <Input id="username" name="username" />
-                            </div>
-                            <div className="grid gap-3">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                </div>
+                                <Label htmlFor="password">New Password</Label>
                                 <Input
                                     id="password"
                                     name="password"
@@ -101,31 +130,23 @@ export function RegisterForm({
                                 />
                             </div>
                             <div className="grid gap-3">
-                                <div className="flex items-center">
-                                    <Label htmlFor="confirmPassword">
-                                        Confirm Password
-                                    </Label>
-                                </div>
+                                <Label htmlFor="confirmPassword">
+                                    Confirm New Password
+                                </Label>
+                                <Input
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    type="password"
+                                />
                             </div>
-                            <Input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type="password"
-                            />
                             <div className="flex flex-col gap-3">
                                 <Button type="submit" className="w-full">
-                                    Sign Up
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    className="w-full text-black"
-                                >
-                                    Sign up with Discord
+                                    Update Password
                                 </Button>
                             </div>
                         </div>
                         <div className="mt-4 text-center text-sm">
-                            Already have an account?{" "}
+                            Remember your password?{" "}
                             <Link
                                 href="/auth/login"
                                 className="underline underline-offset-4"

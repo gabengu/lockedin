@@ -12,15 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export function LoginForm({
+export function ForgotPasswordForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
-    const router = useRouter();
-
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -28,22 +25,20 @@ export function LoginForm({
         const email = formData.get("email") as string;
         if (!email) return toast.error("Email is required");
 
-        const password = formData.get("password") as string;
-        if (!password) return toast.error("Password is required");
-
-        await authClient.signIn.email(
+        const { error } = await authClient.forgetPassword(
             {
                 email: email,
-                password: password,
+                redirectTo: `${window.location.origin}/auth/reset-password`,
             },
             {
                 onRequest: () => {
-                    toast.loading("Signing you in...");
+                    toast.loading("Sending reset email...");
                 },
                 onSuccess: () => {
                     toast.dismiss();
-                    toast.success("Welcome back!");
-                    router.push("/");
+                    toast.success(
+                        "Password reset email sent! Check your inbox.",
+                    );
                 },
                 onError: (ctx) => {
                     toast.dismiss();
@@ -57,9 +52,10 @@ export function LoginForm({
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
                 <CardHeader>
-                    <CardTitle>Login to your account</CardTitle>
+                    <CardTitle>Forgot your password?</CardTitle>
                     <CardDescription>
-                        Enter your email below to login to your account
+                        Enter your email address and we'll send you a link to
+                        reset your password
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -74,41 +70,19 @@ export function LoginForm({
                                     placeholder="email@locked.in"
                                 />
                             </div>
-                            <div className="grid gap-3">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    <Link
-                                        href="/auth/forgot-password"
-                                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                                    >
-                                        Forgot your password?
-                                    </Link>
-                                </div>
-                                <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                />
-                            </div>
                             <div className="flex flex-col gap-3">
                                 <Button type="submit" className="w-full">
-                                    Login
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    className="w-full text-black"
-                                >
-                                    Login with Discord
+                                    Send Reset Email
                                 </Button>
                             </div>
                         </div>
                         <div className="mt-4 text-center text-sm">
-                            Don&apos;t have an account?{" "}
+                            Remember your password?{" "}
                             <Link
-                                href="/auth/register"
+                                href="/auth/login"
                                 className="underline underline-offset-4"
                             >
-                                Sign up
+                                Sign in
                             </Link>
                         </div>
                     </form>
