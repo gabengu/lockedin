@@ -94,24 +94,31 @@ export function LoginForm({
                                 <Button type="submit" className="w-full">
                                     Login
                                 </Button>
-                                <Button
-                                    variant="outline"
-                                    className="w-full text-black"
-                                >
-                                    Login with Discord
-                                </Button>
                             </div>
                         </div>
-                        <div className="mt-4 text-center text-sm">
-                            Don&apos;t have an account?{" "}
-                            <Link
-                                href="/auth/register"
-                                className="underline underline-offset-4"
-                            >
-                                Sign up
-                            </Link>
-                        </div>
                     </form>
+                    <div className="flex flex-col gap-3 mt-6">
+                        <Button
+                            variant="outline"
+                            className="w-full text-black"
+                            onClick={() =>
+                                authClient.signIn.social({
+                                    provider: "discord",
+                                })
+                            }
+                        >
+                            Login with Discord
+                        </Button>
+                    </div>
+                    <div className="mt-4 text-center text-sm">
+                        Don&apos;t have an account?{" "}
+                        <Link
+                            href="/auth/register"
+                            className="underline underline-offset-4"
+                        >
+                            Sign up
+                        </Link>
+                    </div>
                 </CardContent>
             </Card>
         </div>
